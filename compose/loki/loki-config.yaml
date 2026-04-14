@@ -1,0 +1,4 @@
+# Placeholder Fase 2: configuración Loki.
+auth_enabled: false
+server:
+  http_listen_port: 3100

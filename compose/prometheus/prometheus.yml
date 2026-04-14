@@ -1,0 +1,4 @@
+# Placeholder Fase 2: scrape de métricas.
+global:
+  scrape_interval: 15s
+scrape_configs: []

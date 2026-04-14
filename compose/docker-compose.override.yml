@@ -1,0 +1,9 @@
+services:
+  # Archivo reservado para ajustes locales de desarrollo.
+  target-app:
+    environment:
+      LOGGING_LEVEL_ROOT: INFO
+
+  evidence-server:
+    environment:
+      LOGGING_LEVEL_ROOT: INFO

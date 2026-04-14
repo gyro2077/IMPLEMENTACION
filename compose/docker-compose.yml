@@ -1,0 +1,116 @@
+# Fase 1: base reproducible con 2 apps y 2 bases separadas.
+services:
+  postgres-app:
+    image: postgres:18.3
+    container_name: flisol-postgres-app
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${APP_DB_NAME}
+      POSTGRES_USER: ${APP_DB_USER}
+      POSTGRES_PASSWORD: ${APP_DB_PASSWORD}
+    ports:
+      - "${APP_DB_PORT}:5432"
+    volumes:
+      - app_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${APP_DB_USER} -d ${APP_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  opentelemetry-collector:
+    image: otel/opentelemetry-collector-contrib:0.138.0
+    container_name: flisol-otel-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./collector/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    depends_on:
+      jaeger:
+        condition: service_started
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.60
+    container_name: flisol-jaeger
+    restart: unless-stopped
+    ports:
+      - "16686:16686"
+
+  postgres-metadata:
+    image: postgres:18.3
+    container_name: flisol-postgres-metadata
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${META_DB_NAME}
+      POSTGRES_USER: ${META_DB_USER}
+      POSTGRES_PASSWORD: ${META_DB_PASSWORD}
+    ports:
+      - "${METADATA_DB_PORT}:5432"
+    volumes:
+      - metadata_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${META_DB_USER} -d ${META_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  target-app:
+    build:
+      context: ../apps/target-app
+      dockerfile: Dockerfile
+    container_name: flisol-target-app
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      APP_DB_HOST: postgres-app
+      APP_DB_PORT: 5432
+      APP_DB_NAME: ${APP_DB_NAME}
+      APP_DB_USER: ${APP_DB_USER}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+      # Instrumentacion minima de trazas para Fase 2A.
+      JAVA_TOOL_OPTIONS: -javaagent:/opt/otel/opentelemetry-javaagent.jar
+      OTEL_SERVICE_NAME: target-app
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector:4318
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+    depends_on:
+      postgres-app:
+        condition: service_healthy
+      opentelemetry-collector:
+        condition: service_started
+    ports:
+      - "${TARGET_APP_PORT}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  evidence-server:
+    build:
+      context: ../apps/evidence-server
+      dockerfile: Dockerfile
+    container_name: flisol-evidence-server
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      META_DB_HOST: postgres-metadata
+      META_DB_PORT: 5432
+      META_DB_NAME: ${META_DB_NAME}
+      META_DB_USER: ${META_DB_USER}
+      META_DB_PASSWORD: ${META_DB_PASSWORD}
+    depends_on:
+      postgres-metadata:
+        condition: service_healthy
+    ports:
+      - "${EVIDENCE_SERVER_PORT}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  app_db_data:
+  metadata_db_data:

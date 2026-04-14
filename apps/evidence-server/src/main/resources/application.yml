@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: evidence-server
+  datasource:
+    url: jdbc:postgresql://${META_DB_HOST:localhost}:${META_DB_PORT:5432}/${META_DB_NAME:evidence_meta_db}
+    username: ${META_DB_USER:evidence_user}
+    password: ${META_DB_PASSWORD:evidence_password}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
