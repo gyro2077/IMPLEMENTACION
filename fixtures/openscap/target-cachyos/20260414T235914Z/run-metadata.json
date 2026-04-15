@@ -1,0 +1,9 @@
+{
+	"host": "target-cachyos",
+	"profile_id": "xccdf_org.ssgproject.content_profile_cis_level1_server",
+	"datastream_xml": "/usr/share/xml/scap/ssg/content/ssg-ubuntu2404-ds.xml",
+	"started_at": "2026-04-14T23:59:14Z",
+	"finished_at": "2026-04-14T23:59:17Z",
+	"arf_path": "/home/gyro/Documents/FLISOL/IMPLEMENTACION/fixtures/openscap/target-cachyos/20260414T235914Z/scan-results.arf.xml",
+	"html_report_path": "/home/gyro/Documents/FLISOL/IMPLEMENTACION/fixtures/openscap/target-cachyos/20260414T235914Z/scan-report.html"
+}

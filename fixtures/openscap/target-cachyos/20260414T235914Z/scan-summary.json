@@ -1,0 +1,13 @@
+{
+  "host": "target-cachyos",
+  "profile_id": "xccdf_org.ssgproject.content_profile_cis_level1_server",
+  "score": 0.0,
+  "status": "completed",
+  "arf_path": "/home/gyro/Documents/FLISOL/IMPLEMENTACION/fixtures/openscap/target-cachyos/20260414T235914Z/scan-results.arf.xml",
+  "html_report_path": "/home/gyro/Documents/FLISOL/IMPLEMENTACION/fixtures/openscap/target-cachyos/20260414T235914Z/scan-report.html",
+  "started_at": "2026-04-14T18:59:14-05:00",
+  "finished_at": "2026-04-14T18:59:14-05:00",
+  "failed_rules": [],
+  "failed_rules_count": 0,
+  "generated_at": "2026-04-14T23:59:58.404652+00:00"
+}
