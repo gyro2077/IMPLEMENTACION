@@ -24,3 +24,7 @@ management:
   endpoint:
     health:
       show-details: always
+
+app:
+  reports:
+    output-dir: /app/data/reports

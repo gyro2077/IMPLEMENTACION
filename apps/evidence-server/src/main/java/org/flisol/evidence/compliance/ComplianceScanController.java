@@ -2,8 +2,10 @@ package org.flisol.evidence.compliance;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,5 +33,10 @@ public class ComplianceScanController {
     @GetMapping("/scans")
     public List<Map<String, Object>> listScans() {
         return complianceScanService.listScans();
+    }
+
+    @GetMapping("/scans/{id}")
+    public Map<String, Object> getScanById(@PathVariable UUID id) {
+        return complianceScanService.getScanById(id);
     }
 }

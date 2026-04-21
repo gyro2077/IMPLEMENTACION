@@ -64,3 +64,29 @@ CREATE INDEX IF NOT EXISTS idx_backup_run_created_at
 
 CREATE INDEX IF NOT EXISTS idx_restore_run_created_at
   ON restore_run(created_at DESC);
+
+-- Fase 5B: persistencia de jobs de reporte PDF.
+CREATE TABLE IF NOT EXISTS report_job (
+  id UUID PRIMARY KEY,
+  host_name VARCHAR(120) NOT NULL,
+  status VARCHAR(30) NOT NULL,
+  pdf_path TEXT,
+  error_message TEXT,
+  started_at TIMESTAMPTZ,
+  finished_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE report_job ADD COLUMN IF NOT EXISTS host_name VARCHAR(120);
+ALTER TABLE report_job ADD COLUMN IF NOT EXISTS status VARCHAR(30);
+ALTER TABLE report_job ADD COLUMN IF NOT EXISTS pdf_path TEXT;
+ALTER TABLE report_job ADD COLUMN IF NOT EXISTS error_message TEXT;
+ALTER TABLE report_job ADD COLUMN IF NOT EXISTS started_at TIMESTAMPTZ;
+ALTER TABLE report_job ADD COLUMN IF NOT EXISTS finished_at TIMESTAMPTZ;
+ALTER TABLE report_job ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
+CREATE INDEX IF NOT EXISTS idx_report_job_created_at
+  ON report_job(created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_report_job_host_name
+  ON report_job(host_name);

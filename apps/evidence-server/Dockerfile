@@ -14,6 +14,8 @@ RUN apt-get update \
 	&& apt-get install -y --no-install-recommends wget \
 	&& rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p /app/data/reports
+
 COPY --from=build /workspace/target/*.jar app.jar
 EXPOSE 8080
 

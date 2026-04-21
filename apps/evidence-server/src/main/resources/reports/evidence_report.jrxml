@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="EvidenceReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a1b2c3d4-e5f6-7890-1234-567890abcdef">
+	<parameter name="hostName" class="java.lang.String"/>
+	<parameter name="generationDate" class="java.lang.String"/>
+	<parameter name="complianceScore" class="java.lang.String"/>
+	<parameter name="criticalFindings" class="java.lang.String"/>
+	<parameter name="lastBackupLabel" class="java.lang.String"/>
+	<parameter name="lastRestoreRto" class="java.lang.String"/>
+	<parameter name="executiveConclusion" class="java.lang.String"/>
+	
+	<title>
+		<band height="90" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="10" width="555" height="40" uuid="0e8eb8a3-2d25-4c07-96a8-f5de3073f15c"/>
+				<textElement textAlignment="Center">
+					<font size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reporte de Evidencia - Evidence as Code]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="60" width="555" height="20" uuid="4c9e42c2-832f-48d6-9430-b3b3a38cf2f4"/>
+				<textElement textAlignment="Center">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Host: " + $P{hostName} + " - " + $P{generationDate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	
+	<detail>
+		<band height="400" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="10" width="200" height="20" uuid="098f6bcd-4621-3373-8ade-4e832627b4f6"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[1. Cumplimiento (Compliance)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="20" y="40" width="500" height="20" uuid="198f6bcd-4621-3373-8ade-4e832627b4f6"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Score de cumplimiento: " + $P{complianceScore}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="20" y="70" width="200" height="20" uuid="298f6bcd-4621-3373-8ade-4e832627b4f6"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Hallazgos Críticos:]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="20" y="100" width="500" height="40" uuid="398f6bcd-4621-3373-8ade-4e832627b4f6"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{criticalFindings}]]></textFieldExpression>
+			</textField>
+			
+			<staticText>
+				<reportElement x="0" y="160" width="200" height="20" uuid="498f6bcd-4621-3373-8ade-4e832627b4f6"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[2. Resiliencia (Backup & Restore)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="20" y="190" width="500" height="20" uuid="598f6bcd-4621-3373-8ade-4e832627b4f6"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Último Backup Válido: " + $P{lastBackupLabel}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="20" y="220" width="500" height="20" uuid="698f6bcd-4621-3373-8ade-4e832627b4f6"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Último Restore Verificado (RTO): " + $P{lastRestoreRto}]]></textFieldExpression>
+			</textField>
+			
+			<staticText>
+				<reportElement x="0" y="270" width="200" height="20" uuid="798f6bcd-4621-3373-8ade-4e832627b4f6"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[3. Conclusión Ejecutiva]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="20" y="300" width="500" height="40" uuid="898f6bcd-4621-3373-8ade-4e832627b4f6"/>
+				<textElement>
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{executiveConclusion}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="200" y="5" width="155" height="20" uuid="e7b233a7-5d27-4648-91b4-106ea9de7a0d"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

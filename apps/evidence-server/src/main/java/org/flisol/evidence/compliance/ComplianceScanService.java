@@ -8,8 +8,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ComplianceScanService {
@@ -130,6 +132,66 @@ public class ComplianceScanService {
         }
 
         return scans;
+    }
+
+    public Map<String, Object> getScanById(UUID scanId) {
+        List<Map<String, Object>> scans = jdbcTemplate.query(
+            """
+            SELECT id, host_name, profile_id, score, status, arf_path, html_report_path, started_at, finished_at, created_at
+            FROM compliance_scan
+            WHERE id = ?
+            """,
+            (rs, rowNum) -> {
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("id", rs.getObject("id").toString());
+                row.put("host", rs.getString("host_name"));
+                row.put("profile_id", rs.getString("profile_id"));
+                row.put("score", rs.getBigDecimal("score"));
+                row.put("status", rs.getString("status"));
+                row.put("arf_path", rs.getString("arf_path"));
+                row.put("html_report_path", rs.getString("html_report_path"));
+                row.put("started_at", asIso(rs.getObject("started_at")));
+                row.put("finished_at", asIso(rs.getObject("finished_at")));
+                row.put("created_at", asIso(rs.getObject("created_at")));
+                return row;
+            },
+            scanId
+        );
+
+        if (scans.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Scan no encontrado: " + scanId);
+        }
+
+        Map<String, Object> scan = scans.getFirst();
+        List<Map<String, Object>> topFailed = jdbcTemplate.query(
+            """
+            SELECT rule_id, severity, result, title
+            FROM compliance_rule_result
+            WHERE scan_id = ? AND LOWER(COALESCE(result, '')) = 'fail'
+            ORDER BY
+              CASE LOWER(COALESCE(severity, ''))
+                WHEN 'critical' THEN 1
+                WHEN 'high' THEN 2
+                WHEN 'medium' THEN 3
+                WHEN 'low' THEN 4
+                ELSE 5
+              END,
+              title
+            LIMIT 10
+            """,
+            (rs, rowNum) -> {
+                Map<String, Object> rule = new LinkedHashMap<>();
+                rule.put("rule_id", rs.getString("rule_id"));
+                rule.put("severity", rs.getString("severity"));
+                rule.put("result", rs.getString("result"));
+                rule.put("title", rs.getString("title"));
+                return rule;
+            },
+            scanId
+        );
+
+        scan.put("top_failed_rules", topFailed);
+        return scan;
     }
 
     private String asString(Object value, String fallback) {
