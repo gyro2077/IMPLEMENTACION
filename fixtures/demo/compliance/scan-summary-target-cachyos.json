@@ -1,0 +1,32 @@
+{
+  "host": "target-cachyos",
+  "profile_id": "xccdf_org.ssgproject.content_profile_cis_level1_server",
+  "score": 82.5,
+  "status": "completed",
+  "arf_path": "fixtures/demo/compliance/scan-results.arf.xml",
+  "html_report_path": "fixtures/demo/compliance/scan-report.html",
+  "started_at": "2026-04-21T00:00:00Z",
+  "finished_at": "2026-04-21T00:02:00Z",
+  "failed_rules": [
+    {
+      "rule_id": "xccdf_org.ssgproject.content_rule_no_empty_passwords",
+      "severity": "high",
+      "result": "fail",
+      "title": "No permitir cuentas con password vacia"
+    },
+    {
+      "rule_id": "xccdf_org.ssgproject.content_rule_sshd_disable_root_login",
+      "severity": "medium",
+      "result": "fail",
+      "title": "Deshabilitar login root por SSH"
+    },
+    {
+      "rule_id": "xccdf_org.ssgproject.content_rule_firewalld_enabled",
+      "severity": "medium",
+      "result": "fail",
+      "title": "Mantener firewall habilitado"
+    }
+  ],
+  "failed_rules_count": 3,
+  "generated_at": "2026-04-21T00:02:01Z"
+}

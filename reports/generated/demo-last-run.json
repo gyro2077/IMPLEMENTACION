@@ -1,0 +1,13 @@
+{
+  "run_timestamp_utc": "20260421T184349Z",
+  "host": "target-cachyos",
+  "total_seconds": 93,
+  "max_seconds": 420,
+  "target_under_7min": "pass",
+  "manual_commands": 1,
+  "failures": 0,
+  "recovery_mode": "reset_demo.sh + demo_run.sh",
+  "pdf_path": "/home/gyro/Documents/FLISOL/IMPLEMENTACION/reports/generated/demo-report-20260421T184349Z.pdf",
+  "hosts_in_overview": 1,
+  "step_durations": "stack-check=0s;reset-demo=1s;seed-demo-data=1s;backup-full=65s;restore-isolated=25s;smoke-restore=1s;generate-report=0s; "
+}
