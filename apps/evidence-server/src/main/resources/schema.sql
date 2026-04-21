@@ -26,3 +26,41 @@ CREATE INDEX IF NOT EXISTS idx_compliance_scan_created_at
 
 CREATE INDEX IF NOT EXISTS idx_compliance_rule_scan_id
   ON compliance_rule_result(scan_id);
+
+-- Fase 4: persistencia minima de backup y restore PostgreSQL.
+CREATE TABLE IF NOT EXISTS backup_run (
+  id UUID PRIMARY KEY,
+  host_name VARCHAR(120) NOT NULL,
+  backup_type VARCHAR(30) NOT NULL,
+  backup_label VARCHAR(120),
+  status VARCHAR(30) NOT NULL,
+  size_bytes BIGINT,
+  duration_seconds INTEGER,
+  started_at TIMESTAMPTZ,
+  finished_at TIMESTAMPTZ,
+  repo_path TEXT,
+  details_path TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS restore_run (
+  id UUID PRIMARY KEY,
+  host_name VARCHAR(120) NOT NULL,
+  backup_label VARCHAR(120),
+  status VARCHAR(30) NOT NULL,
+  rows_expected INTEGER,
+  rows_restored INTEGER,
+  rto_seconds INTEGER,
+  smoke_passed INTEGER,
+  smoke_total INTEGER,
+  started_at TIMESTAMPTZ,
+  finished_at TIMESTAMPTZ,
+  details_path TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_backup_run_created_at
+  ON backup_run(created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_restore_run_created_at
+  ON restore_run(created_at DESC);

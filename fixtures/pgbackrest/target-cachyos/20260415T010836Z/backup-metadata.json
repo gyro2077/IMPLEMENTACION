@@ -1,0 +1,17 @@
+{
+	"host": "target-cachyos",
+	"stanza": "appdb",
+	"backup_type": "full",
+	"check_status": "warning",
+	"check_exit_code": 82,
+	"backup_label": "20260415-010937F",
+	"status": "success",
+	"size_bytes": 4106608,
+	"duration_seconds": 64,
+	"started_at": "2026-04-15T01:08:36Z",
+	"finished_at": "2026-04-15T01:09:40Z",
+	"data_directory": "/var/lib/postgresql/18/docker",
+	"repo_path": "/home/gyro/Documents/FLISOL/IMPLEMENTACION/fixtures/pgbackrest/repo/current",
+	"expected_rows": 20,
+	"expected_sum": "2205.00"
+}
