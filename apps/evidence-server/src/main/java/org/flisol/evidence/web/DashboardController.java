@@ -236,41 +236,12 @@ public class DashboardController {
         boolean hasBackup = host.get("latest_backup_label") != null;
         boolean hasRestore = host.get("latest_restore_backup_label") != null;
 
-        String backupStatus = asText(host.get("latest_backup_status")).toLowerCase();
-        String restoreStatus = asText(host.get("latest_restore_status")).toLowerCase();
-        int smokePassed = parseInt(host.get("latest_restore_smoke_passed"));
-        int smokeTotal = parseInt(host.get("latest_restore_smoke_total"));
         int rto = parseInt(host.get("latest_restore_rto_seconds"));
 
-        boolean hasProblem = (hasCompliance && score > 0 && score < 70)
-            || isNegativeStatus(backupStatus)
-            || isNegativeStatus(restoreStatus)
-            || (smokeTotal > 0 && smokePassed < smokeTotal);
-
-        String statusKey;
-        String statusLabel;
-        String statusMessage;
-        if (hasProblem) {
-            statusKey = "problem";
-            statusLabel = "Problema";
-            statusMessage = "Se detecta riesgo operativo o evidencia inconsistente. Requiere atencion.";
-        } else if (hasCompliance && hasBackup && hasRestore) {
-            statusKey = "ready";
-            statusLabel = "Listo";
-            statusMessage = "Host con evidencia completa para demo y auditoria.";
-        } else if (hasCompliance || hasBackup || hasRestore) {
-            statusKey = "partial";
-            statusLabel = "Parcial";
-            statusMessage = "Hay evidencia, pero faltan pasos para cerrar el ciclo completo.";
-        } else {
-            statusKey = "empty";
-            statusLabel = "Sin evidencia";
-            statusMessage = "Aun no se cargaron datos de cumplimiento, backup o restore.";
-        }
-
-        view.put("status_key", statusKey);
-        view.put("status_label", statusLabel);
-        view.put("status_message", statusMessage);
+        view.put("status_key", asText(host.get("evidence_status")));
+        view.put("status_label", asText(host.get("evidence_status_label")));
+        view.put("status_message", asText(host.get("evidence_status_message")));
+        
         view.put("compliance_human", hasCompliance
             ? "Puntaje " + (score <= 0 ? "N/A" : asText(host.get("latest_compliance_score")) + " / 100")
             : "No hay scan cargado");
@@ -284,9 +255,7 @@ public class DashboardController {
         return view;
     }
 
-    private boolean isNegativeStatus(String status) {
-        return status.contains("fail") || status.contains("error") || status.contains("warning");
-    }
+
 
     private String cssClassForState(String status) {
         return switch (status) {

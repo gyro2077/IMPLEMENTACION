@@ -21,7 +21,10 @@ public class EvidenceReadService {
     public List<Map<String, Object>> listHosts() {
         List<Map<String, Object>> hosts = repository.listHostsWithLatestEvidence();
         for (Map<String, Object> host : hosts) {
-            host.put("evidence_status", computeEvidenceStatus(host));
+            Map<String, String> evaluation = EvidenceStateEvaluator.evaluate(host);
+            host.put("evidence_status", evaluation.get("status_key"));
+            host.put("evidence_status_label", evaluation.get("status_label"));
+            host.put("evidence_status_message", evaluation.get("status_message"));
         }
         return hosts;
     }
@@ -52,19 +55,5 @@ public class EvidenceReadService {
 
     public List<Map<String, Object>> listScans() {
         return complianceScanService.listScans();
-    }
-
-    private String computeEvidenceStatus(Map<String, Object> host) {
-        boolean hasCompliance = host.get("latest_compliance_scan_id") != null;
-        boolean hasBackup = host.get("latest_backup_label") != null;
-        boolean hasRestore = host.get("latest_restore_backup_label") != null;
-
-        if (hasCompliance && hasBackup && hasRestore) {
-            return "ready";
-        }
-        if (hasCompliance || hasBackup || hasRestore) {
-            return "partial";
-        }
-        return "empty";
     }
 }
