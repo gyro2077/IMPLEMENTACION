@@ -1,0 +1,28 @@
+{
+  "title": "Target App Overview",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "System CPU Usage",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "system_cpu_usage{job=\"target-app\"}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "logs",
+      "title": "Target App Logs",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "{container=\"flisol-target-app\"}",
+          "refId": "A"
+        }
+      ],
+      "datasource": { "type": "loki", "uid": "Loki" }
+    }
+  ]
+}

@@ -1,4 +1,12 @@
-# Placeholder Fase 2: scrape de métricas.
 global:
   scrape_interval: 15s
-scrape_configs: []
+
+scrape_configs:
+  - job_name: 'target-app'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['target-app:8080']
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

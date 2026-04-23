@@ -1,4 +1,4 @@
-# Fase 1: base reproducible con 2 apps y 2 bases separadas.
+# Fase 1 y Fase 2: Aplicaciones y Observabilidad Base
 services:
   postgres-app:
     image: postgres:18.3
@@ -36,6 +36,48 @@ services:
     ports:
       - "16686:16686"
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: flisol-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: flisol-grafana
+    restart: unless-stopped
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"
+
+  loki:
+    image: grafana/loki:3.3.2
+    container_name: flisol-loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/local-config.yaml:ro
+    ports:
+      - "3100:3100"
+
+  alloy:
+    image: grafana/alloy:v1.6.0
+    container_name: flisol-alloy
+    restart: unless-stopped
+    command: run --server.http.listen-addr=0.0.0.0:12345 /etc/alloy/config.alloy
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "12345:12345"
+
   postgres-metadata:
     image: postgres:18.3
     container_name: flisol-postgres-metadata
@@ -67,7 +109,6 @@ services:
       APP_DB_NAME: ${APP_DB_NAME}
       APP_DB_USER: ${APP_DB_USER}
       APP_DB_PASSWORD: ${APP_DB_PASSWORD}
-      # Instrumentacion minima de trazas para Fase 2A.
       JAVA_TOOL_OPTIONS: -javaagent:/opt/otel/opentelemetry-javaagent.jar
       OTEL_SERVICE_NAME: target-app
       OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector:4318
