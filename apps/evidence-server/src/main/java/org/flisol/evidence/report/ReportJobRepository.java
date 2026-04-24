@@ -71,6 +71,25 @@ public class ReportJobRepository {
         return list.isEmpty() ? null : list.get(0);
     }
 
+    public List<Map<String, Object>> findRecent(int limit) {
+        return jdbcTemplate.query(
+            "SELECT id, host_name, status, pdf_path, error_message, started_at, finished_at, created_at FROM report_job ORDER BY created_at DESC LIMIT ?",
+            (rs, rowNum) -> {
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("id", rs.getObject("id").toString());
+                row.put("host_name", rs.getString("host_name"));
+                row.put("status", rs.getString("status"));
+                row.put("pdf_path", rs.getString("pdf_path"));
+                row.put("error_message", rs.getString("error_message"));
+                row.put("started_at", asString(rs.getObject("started_at")));
+                row.put("finished_at", asString(rs.getObject("finished_at")));
+                row.put("created_at", asString(rs.getObject("created_at")));
+                return row;
+            },
+            limit
+        );
+    }
+
     private String asString(Object value) {
         return value == null ? null : value.toString();
     }

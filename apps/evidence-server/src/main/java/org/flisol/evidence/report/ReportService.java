@@ -217,6 +217,10 @@ public class ReportService {
         return "El host no cuenta con evidencia registrada.";
     }
 
+    public List<Map<String, Object>> listRecentReports(int limit) {
+        return reportJobRepository.findRecent(limit);
+    }
+
     private String asString(Object obj) {
         if (obj == null) {
             return null;

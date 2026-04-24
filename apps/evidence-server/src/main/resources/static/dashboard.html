@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Panel Administrador — Evidence as Code</title>
+    <meta name="description" content="Panel de administración centralizado para auditoría, cumplimiento y resiliencia de infraestructura."/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+    <header id="app-header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>Panel Administrador</h1>
+                <p class="header-sub">Evidence as Code — FLISOL Demo</p>
+            </div>
+            <div class="header-right">
+                <span id="env-badge" class="badge badge-ready">Cargando…</span>
+                <span id="header-time" class="header-time"></span>
+            </div>
+        </div>
+    </header>
+
+    <nav id="tab-nav">
+        <div class="tab-nav-inner">
+            <button class="tab active" data-tab="resumen">Resumen</button>
+            <button class="tab" data-tab="cumplimiento">Cumplimiento</button>
+            <button class="tab" data-tab="resiliencia">Resiliencia</button>
+            <button class="tab" data-tab="reportes">Reportes</button>
+            <button class="tab" data-tab="observabilidad">Observabilidad</button>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <div class="container">
+            <!-- Loading state -->
+            <div id="loading" class="loading-box">
+                <div class="spinner"></div>
+                <p>Cargando datos del sistema…</p>
+            </div>
+
+            <!-- Error state -->
+            <div id="error-box" class="error-box" style="display:none;">
+                <h3>Error de conexión</h3>
+                <p id="error-msg">No se pudo conectar con el servidor de evidencia.</p>
+                <button class="btn btn-primary" onclick="loadData()">Reintentar</button>
+            </div>
+
+            <!-- Tab: Resumen -->
+            <section id="tab-resumen" class="tab-content" style="display:none;">
+                <div id="kpi-grid" class="kpi-grid"></div>
+                <div class="grid-2">
+                    <div id="primary-host-card" class="card card-accent"></div>
+                    <div class="card">
+                        <h2 class="card-title">Actividad Reciente</h2>
+                        <ul id="timeline" class="timeline"></ul>
+                        <p id="timeline-empty" class="empty-msg" style="display:none;">Sin actividad registrada aún.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Cumplimiento -->
+            <section id="tab-cumplimiento" class="tab-content" style="display:none;">
+                <div class="card">
+                    <h2 class="card-title">Historial de Auditorías de Seguridad</h2>
+                    <p class="card-desc">Escaneos de cumplimiento realizados con OpenSCAP contra políticas CIS.</p>
+                    <div id="scans-table"></div>
+                </div>
+            </section>
+
+            <!-- Tab: Resiliencia -->
+            <section id="tab-resiliencia" class="tab-content" style="display:none;">
+                <div class="grid-2">
+                    <div class="card">
+                        <h2 class="card-title">Respaldos (Backups)</h2>
+                        <p class="card-desc">Respaldos full gestionados con pgBackRest.</p>
+                        <div id="backups-table"></div>
+                    </div>
+                    <div class="card">
+                        <h2 class="card-title">Recuperaciones (Restores)</h2>
+                        <p class="card-desc">Pruebas de restauración en entornos aislados con smoke tests.</p>
+                        <div id="restores-table"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Reportes -->
+            <section id="tab-reportes" class="tab-content" style="display:none;">
+                <div class="card">
+                    <div class="card-header-row">
+                        <div>
+                            <h2 class="card-title">Reportes Ejecutivos</h2>
+                            <p class="card-desc">Reportes PDF generados automáticamente con JasperReports.</p>
+                        </div>
+                        <button id="btn-gen-report" class="btn btn-primary" onclick="generateReport()">Generar Nuevo Reporte</button>
+                    </div>
+                    <div id="reports-table"></div>
+                    <p id="reports-empty" class="empty-msg" style="display:none;">No hay reportes generados aún. Presiona el botón para crear uno.</p>
+                </div>
+            </section>
+
+            <!-- Tab: Observabilidad -->
+            <section id="tab-observabilidad" class="tab-content" style="display:none;">
+                <div class="card">
+                    <h2 class="card-title">Observabilidad del Sistema</h2>
+                    <p class="card-desc">El sistema recopila telemetría de forma automática para asegurar transparencia en todas las operaciones.</p>
+                    <div class="obs-grid">
+                        <div class="obs-card">
+                            <div class="obs-icon">📊</div>
+                            <h3>Métricas</h3>
+                            <p>Consumo de CPU, memoria, tiempos de respuesta HTTP y métricas JVM. Recopiladas por Micrometer y visualizadas en Prometheus.</p>
+                            <a href="http://localhost:9090" target="_blank" class="btn btn-outline btn-sm">Ver Prometheus</a>
+                        </div>
+                        <div class="obs-card">
+                            <div class="obs-icon">📝</div>
+                            <h3>Logs Centralizados</h3>
+                            <p>Todos los logs de los contenedores son recopilados por Alloy y almacenados en Loki para consulta centralizada.</p>
+                            <a href="http://localhost:3000/explore" target="_blank" class="btn btn-outline btn-sm">Explorar en Grafana</a>
+                        </div>
+                        <div class="obs-card">
+                            <div class="obs-icon">🔗</div>
+                            <h3>Trazas Distribuidas</h3>
+                            <p>Seguimiento de cada petición HTTP entre microservicios usando OpenTelemetry y Jaeger.</p>
+                            <a href="http://localhost:16686" target="_blank" class="btn btn-outline btn-sm">Ver Jaeger</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 class="card-title">Dashboards Integrados</h2>
+                    <p class="card-desc">Accede a las herramientas de monitoreo con un clic.</p>
+                    <div class="obs-links">
+                        <a href="http://localhost:3000" target="_blank" class="btn btn-primary">Abrir Grafana</a>
+                        <a href="http://localhost:16686" target="_blank" class="btn btn-secondary">Abrir Jaeger</a>
+                        <a href="http://localhost:9090" target="_blank" class="btn btn-secondary">Abrir Prometheus</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer id="action-bar">
+        <div class="action-bar-inner">
+            <div class="action-buttons" id="action-buttons"></div>
+            <div class="action-links">
+                <a href="/api/hosts" target="_blank">/api/hosts</a>
+                <a href="/api/evidence/overview" target="_blank">/api/overview</a>
+                <a href="/api/compliance/scans" target="_blank">/api/scans</a>
+                <a href="/api/backups" target="_blank">/api/backups</a>
+                <a href="/api/restores" target="_blank">/api/restores</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="/dashboard.js"></script>
+</body>
+</html>

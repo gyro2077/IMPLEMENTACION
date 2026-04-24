@@ -1,5 +1,6 @@
 package org.flisol.evidence;
 
+import java.io.IOException;
 import org.flisol.evidence.web.DashboardController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,10 @@ public class EvidenceIntegrationTest {
     }
 
     @Test
-    public void dashboardReturnsHtml() {
+    public void dashboardReturnsHtml() throws IOException {
         String html = dashboardController.dashboard();
-        assertTrue(html.contains("Estado Operativo"), "El dashboard deberia contener el titulo rediseñado");
-        assertTrue(html.contains("Inter"), "Deberia utilizar la tipografia moderna");
+        assertTrue(html.contains("Panel Administrador"), "El dashboard deberia contener el titulo del panel");
+        assertTrue(html.contains("dashboard.js"), "Deberia referenciar el JavaScript del dashboard");
     }
 }
+
