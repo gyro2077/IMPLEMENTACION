@@ -37,13 +37,23 @@ check_url "http://localhost:8082/api/evidence/overview" "200"
 
 echo "4. Acciones configuradas correctamente"
 GEN_ENABLED=$(echo "$DASHBOARD_JSON" | jq -r '.actions.generate_report.enabled')
-BK_ENABLED=$(echo "$DASHBOARD_JSON" | jq -r '.actions.execute_backup.enabled')
+SCAN_ENABLED=$(echo "$DASHBOARD_JSON" | jq -r '.actions.run_scan.enabled')
+BK_ENABLED=$(echo "$DASHBOARD_JSON" | jq -r '.actions.run_backup.enabled')
+RS_ENABLED=$(echo "$DASHBOARD_JSON" | jq -r '.actions.run_restore.enabled')
 if [ "$GEN_ENABLED" != "true" ]; then
   echo "  FAIL: generate_report debería estar habilitado"
   exit 1
 fi
-if [ "$BK_ENABLED" != "false" ]; then
-  echo "  FAIL: execute_backup debería estar deshabilitado"
+if [ "$SCAN_ENABLED" != "true" ]; then
+  echo "  FAIL: run_scan debería estar habilitado"
+  exit 1
+fi
+if [ "$BK_ENABLED" != "true" ]; then
+  echo "  FAIL: run_backup debería estar habilitado"
+  exit 1
+fi
+if [ "$RS_ENABLED" != "true" ]; then
+  echo "  FAIL: run_restore debería estar habilitado"
   exit 1
 fi
 echo "  OK: Acciones correctamente habilitadas/deshabilitadas"

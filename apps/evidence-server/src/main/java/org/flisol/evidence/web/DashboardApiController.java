@@ -175,17 +175,23 @@ public class DashboardApiController {
             "enabled", true, "label", "Recargar Dataset",
             "endpoint", "/api/actions/reload-dataset", "method", "POST"
         ));
-        actions.put("execute_backup", Map.of(
-            "enabled", false, "label", "Ejecutar Backup",
-            "reason", "Requiere integración con agente pgBackRest (ETAPA 2)."
+        actions.put("run_scan", Map.of(
+            "enabled", true,
+            "label", "Ejecutar Scan",
+            "endpoint", "/api/actions/run-scan",
+            "method", "POST"
         ));
-        actions.put("execute_restore", Map.of(
-            "enabled", false, "label", "Ejecutar Restore",
-            "reason", "Requiere orquestación de contenedores aislados (ETAPA 2)."
+        actions.put("run_backup", Map.of(
+            "enabled", true,
+            "label", "Ejecutar Backup",
+            "endpoint", "/api/actions/run-backup",
+            "method", "POST"
         ));
-        actions.put("execute_scan", Map.of(
-            "enabled", false, "label", "Ejecutar Scan",
-            "reason", "Requiere agente OpenSCAP en el host target (ETAPA 2)."
+        actions.put("run_restore", Map.of(
+            "enabled", true,
+            "label", "Ejecutar Restore",
+            "endpoint", "/api/actions/run-restore",
+            "method", "POST"
         ));
         return actions;
     }

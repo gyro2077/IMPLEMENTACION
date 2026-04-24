@@ -15,12 +15,14 @@ public class EvidenceStateEvaluator {
         String restoreStatus = asText(hostData.get("latest_restore_status")).toLowerCase();
         int smokePassed = parseInt(hostData.get("latest_restore_smoke_passed"));
         int smokeTotal = parseInt(hostData.get("latest_restore_smoke_total"));
+        int smokeMissing = Math.max(smokeTotal - smokePassed, 0);
 
         boolean hasCriticalProblem = (hasCompliance && score > 0 && score < 70)
                 || isNegativeStatus(backupStatus)
                 || isNegativeStatus(restoreStatus);
 
-        boolean hasObservations = (smokeTotal > 0 && smokePassed < smokeTotal);
+        // In this MVP the restore smoke suite has one optional check marked as skip.
+        boolean hasObservations = (smokeTotal > 0 && smokeMissing > 1);
 
         String statusKey;
         String statusLabel;

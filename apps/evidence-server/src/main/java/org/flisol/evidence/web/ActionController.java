@@ -1,7 +1,10 @@
 package org.flisol.evidence.web;
 
+import java.util.UUID;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,19 +18,22 @@ import org.springframework.web.bind.annotation.RestController;
  * - Nunca se expone ejecución de shell
  * - Resultado siempre persistido o retornado con estado claro
  *
- * Acciones futuras (ETAPA 2+):
- * - POST /api/actions/execute-backup  → requiere ActionJobService + pgBackRest agent
- * - POST /api/actions/execute-restore → requiere container orchestration
- * - POST /api/actions/execute-scan    → requiere OpenSCAP agent
+ * Acciones implementadas:
+ * - POST /api/actions/run-scan
+ * - POST /api/actions/run-backup
+ * - POST /api/actions/run-restore
+ * - GET  /api/actions/{id}/status
  */
 @RestController
 @RequestMapping("/api/actions")
 public class ActionController {
 
     private final DemoSeedService demoSeedService;
+    private final ActionJobService actionJobService;
 
-    public ActionController(DemoSeedService demoSeedService) {
+    public ActionController(DemoSeedService demoSeedService, ActionJobService actionJobService) {
         this.demoSeedService = demoSeedService;
+        this.actionJobService = actionJobService;
     }
 
     @PostMapping("/reload-dataset")
@@ -35,5 +41,25 @@ public class ActionController {
         Map<String, Object> result = demoSeedService.reloadDemoDataset();
         boolean ok = "COMPLETED".equals(result.get("status"));
         return ok ? ResponseEntity.ok(result) : ResponseEntity.internalServerError().body(result);
+    }
+
+    @PostMapping("/run-scan")
+    public ResponseEntity<Map<String, Object>> runScan() {
+        return ResponseEntity.ok(actionJobService.runScan());
+    }
+
+    @PostMapping("/run-backup")
+    public ResponseEntity<Map<String, Object>> runBackup() {
+        return ResponseEntity.ok(actionJobService.runBackup());
+    }
+
+    @PostMapping("/run-restore")
+    public ResponseEntity<Map<String, Object>> runRestore() {
+        return ResponseEntity.ok(actionJobService.runRestore());
+    }
+
+    @GetMapping("/{id}/status")
+    public ResponseEntity<Map<String, Object>> getActionStatus(@PathVariable UUID id) {
+        return ResponseEntity.ok(actionJobService.getJobStatus(id));
     }
 }

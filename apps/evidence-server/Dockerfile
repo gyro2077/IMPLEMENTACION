@@ -11,7 +11,7 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 RUN apt-get update \
-	&& apt-get install -y --no-install-recommends wget \
+	&& apt-get install -y --no-install-recommends wget bash curl python3 docker.io \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /app/data/reports

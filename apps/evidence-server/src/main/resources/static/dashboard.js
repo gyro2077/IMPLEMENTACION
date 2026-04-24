@@ -264,7 +264,10 @@ function renderReports() {
 /* ── Action Bar ── */
 const ACTION_HANDLERS = {
     generate_report: 'generateReport()',
-    reload_dataset: 'reloadDataset()'
+    reload_dataset: 'reloadDataset()',
+    run_scan: 'runScan()',
+    run_backup: 'runBackup()',
+    run_restore: 'runRestore()'
 };
 
 function renderActionBar() {
@@ -276,7 +279,7 @@ function renderActionBar() {
         if (action.url) {
             html += `<a href="${esc(action.url)}" target="_blank" class="btn ${action.enabled ? 'btn-secondary' : 'btn-disabled'}">${esc(action.label)}</a>`;
         } else if (action.enabled && ACTION_HANDLERS[key]) {
-            html += `<button class="btn btn-primary" onclick="${ACTION_HANDLERS[key]}">${esc(action.label)}</button>`;
+            html += `<button class="btn btn-primary" data-action="${esc(key)}" onclick="${ACTION_HANDLERS[key]}">${esc(action.label)}</button>`;
         } else if (action.enabled) {
             html += `<button class="btn btn-primary" disabled>${esc(action.label)}</button>`;
         } else {
@@ -331,6 +334,89 @@ async function reloadDataset() {
     }
 }
 
+function runScan() {
+    return runAction('run_scan', 'scan de cumplimiento');
+}
+
+function runBackup() {
+    return runAction('run_backup', 'backup');
+}
+
+function runRestore() {
+    return runAction('run_restore', 'restore');
+}
+
+async function runAction(actionKey, label) {
+    const actions = (D && D.actions) || {};
+    const action = actions[actionKey];
+    if (!action || !action.endpoint) {
+        showToast('Acción no disponible en este entorno.', 'error');
+        return;
+    }
+
+    const btn = document.querySelector(`[data-action="${actionKey}"]`);
+    const originalText = btn ? btn.textContent : '';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Ejecutando…';
+    }
+
+    showToast(`Ejecutando ${label}…`, 'info');
+    try {
+        const resp = await fetch(action.endpoint, { method: action.method || 'POST' });
+        if (!resp.ok) {
+            const text = await resp.text();
+            throw new Error(text || `HTTP ${resp.status}`);
+        }
+        const body = await resp.json();
+        if (!body.id) {
+            throw new Error('La acción no devolvió job id.');
+        }
+        showToast(`Job ${shortJobId(body.id)} en cola para ${label}…`, 'info');
+        await pollActionStatus(body.id, label);
+        await loadData();
+    } catch (err) {
+        showToast(`Falló ${label}: ${err.message}`, 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = originalText || 'Ejecutar';
+        }
+    }
+}
+
+async function pollActionStatus(jobId, label) {
+    const maxAttempts = 180;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        await sleep(attempt === 0 ? 600 : 1500);
+        const resp = await fetch(`/api/actions/${encodeURIComponent(jobId)}/status`);
+        if (!resp.ok) {
+            throw new Error(`No se pudo consultar job ${shortJobId(jobId)} (HTTP ${resp.status})`);
+        }
+
+        const body = await resp.json();
+        const status = String(body.status || '').toUpperCase();
+        if (status === 'PENDING') {
+            showToast(`Job ${shortJobId(jobId)} pendiente para ${label}…`, 'info');
+            continue;
+        }
+        if (status === 'RUNNING') {
+            showToast(`Ejecutando ${label}…`, 'info');
+            continue;
+        }
+        if (status === 'COMPLETED') {
+            showToast(`Acción completada: ${label} (${shortJobId(jobId)})`, 'success');
+            return body;
+        }
+        if (status === 'FAILED') {
+            throw new Error(body.error_message || `job ${shortJobId(jobId)} falló`);
+        }
+        throw new Error(`Estado no soportado para job ${shortJobId(jobId)}: ${status || '-'}`);
+    }
+
+    throw new Error(`Timeout esperando job ${shortJobId(jobId)}`);
+}
+
 /* ── Toast ── */
 let toastTimer = null;
 function showToast(message, type) {
@@ -368,6 +454,15 @@ function fmtDateShort(iso) {
 function shortLabel(label) {
     if (!label || label === '-') return '-';
     return label.length > 20 ? label.substring(0, 20) + '…' : label;
+}
+
+function shortJobId(id) {
+    if (!id) return '-';
+    return String(id).slice(0, 8);
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function shortProfile(profileId) {

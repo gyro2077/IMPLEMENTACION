@@ -90,3 +90,23 @@ CREATE INDEX IF NOT EXISTS idx_report_job_created_at
 
 CREATE INDEX IF NOT EXISTS idx_report_job_host_name
   ON report_job(host_name);
+
+-- Fase 6: jobs de acciones operativas seguras del dashboard.
+CREATE TABLE IF NOT EXISTS action_job (
+  id UUID PRIMARY KEY,
+  action_name VARCHAR(60) NOT NULL,
+  host_name VARCHAR(120) NOT NULL,
+  status VARCHAR(30) NOT NULL,
+  command_line TEXT,
+  output_log TEXT,
+  error_message TEXT,
+  started_at TIMESTAMPTZ,
+  finished_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_action_job_created_at
+  ON action_job(created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_action_job_action_name
+  ON action_job(action_name);
