@@ -262,6 +262,11 @@ function renderReports() {
 }
 
 /* ── Action Bar ── */
+const ACTION_HANDLERS = {
+    generate_report: 'generateReport()',
+    reload_dataset: 'reloadDataset()'
+};
+
 function renderActionBar() {
     const actions = D.actions || {};
     const el = document.getElementById('action-buttons');
@@ -270,8 +275,10 @@ function renderActionBar() {
     for (const [key, action] of Object.entries(actions)) {
         if (action.url) {
             html += `<a href="${esc(action.url)}" target="_blank" class="btn ${action.enabled ? 'btn-secondary' : 'btn-disabled'}">${esc(action.label)}</a>`;
+        } else if (action.enabled && ACTION_HANDLERS[key]) {
+            html += `<button class="btn btn-primary" onclick="${ACTION_HANDLERS[key]}">${esc(action.label)}</button>`;
         } else if (action.enabled) {
-            html += `<button class="btn btn-primary" onclick="${key === 'generate_report' ? 'generateReport()' : ''}">${esc(action.label)}</button>`;
+            html += `<button class="btn btn-primary" disabled>${esc(action.label)}</button>`;
         } else {
             html += `<button class="btn btn-disabled" disabled title="${esc(action.reason || '')}">${esc(action.label)}</button>`;
         }
@@ -305,6 +312,22 @@ async function generateReport() {
         showToast('Error de conexión: ' + err.message, 'error');
     } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Generar Nuevo Reporte'; }
+    }
+}
+
+async function reloadDataset() {
+    showToast('Recargando dataset de demostración…', 'info');
+    try {
+        const resp = await fetch('/api/actions/reload-dataset', { method: 'POST' });
+        const body = await resp.json();
+        if (resp.ok && body.status === 'COMPLETED') {
+            showToast('Dataset recargado exitosamente. Actualizando panel…', 'success');
+            setTimeout(() => loadData(), 1500);
+        } else {
+            showToast('Error al recargar: ' + (body.message || resp.status), 'error');
+        }
+    } catch (err) {
+        showToast('Error de conexión: ' + err.message, 'error');
     }
 }
 

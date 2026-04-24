@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="EvidenceReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a1b2c3d4-e5f6-7890-1234-567890abcdef">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="EvidenceReport" pageWidth="595" pageHeight="842"
+              columnWidth="515" leftMargin="40" rightMargin="40"
+              topMargin="30" bottomMargin="30"
+              uuid="a1b2c3d4-e5f6-7890-1234-567890abcdef">
+
 	<parameter name="hostName" class="java.lang.String"/>
 	<parameter name="generationDate" class="java.lang.String"/>
 	<parameter name="complianceScore" class="java.lang.String"/>
@@ -8,115 +14,220 @@
 	<parameter name="lastBackupLabel" class="java.lang.String"/>
 	<parameter name="lastRestoreRto" class="java.lang.String"/>
 	<parameter name="executiveConclusion" class="java.lang.String"/>
-	
+	<parameter name="backupStatus" class="java.lang.String"/>
+	<parameter name="backupSizeHuman" class="java.lang.String"/>
+	<parameter name="backupDuration" class="java.lang.String"/>
+	<parameter name="restoreStatus" class="java.lang.String"/>
+	<parameter name="smokePassed" class="java.lang.String"/>
+	<parameter name="smokeTotal" class="java.lang.String"/>
+	<parameter name="evidenceStatusLabel" class="java.lang.String"/>
+	<parameter name="jaegerUrl" class="java.lang.String"/>
+	<parameter name="timelineSummary" class="java.lang.String"/>
+
 	<title>
-		<band height="90" splitType="Stretch">
+		<band height="200" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="0" width="515" height="140" backcolor="#0F172A" uuid="11111111-2222-3333-4444-555555555555"/>
+				<graphicElement><pen lineWidth="0"/></graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="140" width="515" height="4" backcolor="#2563EB" uuid="22222222-3333-4444-5555-666666666666"/>
+				<graphicElement><pen lineWidth="0"/></graphicElement>
+			</rectangle>
 			<staticText>
-				<reportElement x="0" y="10" width="555" height="40" uuid="0e8eb8a3-2d25-4c07-96a8-f5de3073f15c"/>
-				<textElement textAlignment="Center">
-					<font size="24" isBold="true"/>
+				<reportElement x="30" y="25" width="455" height="35" forecolor="#FFFFFF" uuid="33333333-4444-5555-6666-777777777777"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="22" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Reporte de Evidencia - Evidence as Code]]></text>
+				<text><![CDATA[REPORTE DE EVIDENCIA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="30" y="60" width="455" height="20" forecolor="#94A3B8" uuid="44444444-5555-6666-7777-888888888888"/>
+				<textElement textAlignment="Left">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[Evidence as Code — Auditoría de Cumplimiento y Resiliencia]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="0" y="60" width="555" height="20" uuid="4c9e42c2-832f-48d6-9430-b3b3a38cf2f4"/>
-				<textElement textAlignment="Center">
-					<font size="14"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Host: " + $P{hostName} + " - " + $P{generationDate}]]></textFieldExpression>
+				<reportElement x="30" y="90" width="300" height="20" forecolor="#DBEAFE" uuid="55555555-6666-7777-8888-999999999999"/>
+				<textElement><font size="13" isBold="true"/></textElement>
+				<textFieldExpression><![CDATA["Host: " + $P{hostName}]]></textFieldExpression>
 			</textField>
+			<textField>
+				<reportElement x="30" y="112" width="300" height="18" forecolor="#64748B" uuid="66666666-7777-8888-9999-000000000000"/>
+				<textElement><font size="9"/></textElement>
+				<textFieldExpression><![CDATA["Generado: " + $P{generationDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="360" y="95" width="125" height="25" forecolor="#166534" backcolor="#DCFCE7" uuid="77777777-8888-9999-0000-111111111111"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{evidenceStatusLabel} != null ? $P{evidenceStatusLabel} : "N/A"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="155" width="515" height="15" forecolor="#94A3B8" uuid="88888888-9999-0000-1111-222222222222"/>
+				<textElement textAlignment="Center"><font size="8"/></textElement>
+				<text><![CDATA[— Documento generado automáticamente por el sistema Evidence as Code —]]></text>
+			</staticText>
 		</band>
 	</title>
-	
+
 	<detail>
-		<band height="400" splitType="Stretch">
+		<band height="550" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="5" width="4" height="20" backcolor="#2563EB" uuid="99999999-0000-1111-2222-333333333333"/>
+				<graphicElement><pen lineWidth="0"/></graphicElement>
+			</rectangle>
 			<staticText>
-				<reportElement x="0" y="10" width="200" height="20" uuid="098f6bcd-4621-3373-8ade-4e832627b4f6"/>
-				<textElement>
-					<font size="14" isBold="true"/>
-				</textElement>
-				<text><![CDATA[1. Cumplimiento (Compliance)]]></text>
+				<reportElement x="12" y="5" width="300" height="20" uuid="00000000-1111-2222-3333-444444444444"/>
+				<textElement verticalAlignment="Middle"><font size="14" isBold="true"/></textElement>
+				<text><![CDATA[1. Cumplimiento Normativo]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="32" width="170" height="55" backcolor="#F1F5F9" uuid="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"/>
+				<graphicElement><pen lineWidth="0.5" lineColor="#E2E8F0"/></graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="10" y="36" width="150" height="14" forecolor="#64748B" uuid="bbbbbbbb-cccc-dddd-eeee-ffffffffffff"/>
+				<textElement><font size="8" isBold="true"/></textElement>
+				<text><![CDATA[PUNTAJE DE SEGURIDAD]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="20" y="40" width="500" height="20" uuid="198f6bcd-4621-3373-8ade-4e832627b4f6"/>
-				<textElement>
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Score de cumplimiento: " + $P{complianceScore}]]></textFieldExpression>
+				<reportElement x="10" y="52" width="150" height="30" uuid="cccccccc-dddd-eeee-ffff-000000000000"/>
+				<textElement><font size="20" isBold="true"/></textElement>
+				<textFieldExpression><![CDATA[$P{complianceScore} + " / 100"]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="20" y="70" width="200" height="20" uuid="298f6bcd-4621-3373-8ade-4e832627b4f6"/>
-				<textElement>
-					<font size="12" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Hallazgos Críticos:]]></text>
+				<reportElement x="185" y="32" width="200" height="14" forecolor="#64748B" uuid="dddddddd-eeee-ffff-0000-111111111111"/>
+				<textElement><font size="8" isBold="true"/></textElement>
+				<text><![CDATA[HALLAZGOS DETECTADOS]]></text>
 			</staticText>
 			<textField textAdjust="StretchHeight">
-				<reportElement x="20" y="100" width="500" height="40" uuid="398f6bcd-4621-3373-8ade-4e832627b4f6"/>
-				<textElement>
-					<font size="10"/>
-				</textElement>
+				<reportElement x="185" y="48" width="330" height="40" uuid="eeeeeeee-ffff-0000-1111-222222222222"/>
+				<textElement><font size="9"/></textElement>
 				<textFieldExpression><![CDATA[$P{criticalFindings}]]></textFieldExpression>
 			</textField>
-			
+
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="105" width="4" height="20" backcolor="#16A34A" uuid="ffffffff-0000-1111-2222-333333333333"/>
+				<graphicElement><pen lineWidth="0"/></graphicElement>
+			</rectangle>
 			<staticText>
-				<reportElement x="0" y="160" width="200" height="20" uuid="498f6bcd-4621-3373-8ade-4e832627b4f6"/>
-				<textElement>
-					<font size="14" isBold="true"/>
-				</textElement>
+				<reportElement x="12" y="105" width="300" height="20" uuid="00000000-2222-3333-4444-555555555555"/>
+				<textElement verticalAlignment="Middle"><font size="14" isBold="true"/></textElement>
 				<text><![CDATA[2. Resiliencia (Backup & Restore)]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="20" y="190" width="500" height="20" uuid="598f6bcd-4621-3373-8ade-4e832627b4f6"/>
-				<textElement>
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Último Backup Válido: " + $P{lastBackupLabel}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="20" y="220" width="500" height="20" uuid="698f6bcd-4621-3373-8ade-4e832627b4f6"/>
-				<textElement>
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Último Restore Verificado (RTO): " + $P{lastRestoreRto}]]></textFieldExpression>
-			</textField>
-			
+
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="132" width="250" height="70" backcolor="#F1F5F9" uuid="11111111-3333-4444-5555-666666666666"/>
+				<graphicElement><pen lineWidth="0.5" lineColor="#E2E8F0"/></graphicElement>
+			</rectangle>
 			<staticText>
-				<reportElement x="0" y="270" width="200" height="20" uuid="798f6bcd-4621-3373-8ade-4e832627b4f6"/>
-				<textElement>
-					<font size="14" isBold="true"/>
-				</textElement>
-				<text><![CDATA[3. Conclusión Ejecutiva]]></text>
+				<reportElement x="10" y="136" width="230" height="14" forecolor="#64748B" uuid="22222222-4444-5555-6666-777777777777"/>
+				<textElement><font size="8" isBold="true"/></textElement>
+				<text><![CDATA[ÚLTIMO RESPALDO]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="10" y="152" width="230" height="18" uuid="33333333-5555-6666-7777-888888888888"/>
+				<textElement><font size="11" isBold="true"/></textElement>
+				<textFieldExpression><![CDATA[$P{lastBackupLabel}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="172" width="230" height="25" forecolor="#475569" uuid="44444444-6666-7777-8888-999999999999"/>
+				<textElement><font size="9"/></textElement>
+				<textFieldExpression><![CDATA["Estado: " + $P{backupStatus} + "  |  Tamaño: " + $P{backupSizeHuman} + "  |  Duración: " + $P{backupDuration}]]></textFieldExpression>
+			</textField>
+
+			<rectangle>
+				<reportElement mode="Opaque" x="262" y="132" width="253" height="70" backcolor="#F1F5F9" uuid="55555555-7777-8888-9999-000000000000"/>
+				<graphicElement><pen lineWidth="0.5" lineColor="#E2E8F0"/></graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="272" y="136" width="230" height="14" forecolor="#64748B" uuid="66666666-8888-9999-0000-111111111111"/>
+				<textElement><font size="8" isBold="true"/></textElement>
+				<text><![CDATA[PRUEBA DE RECUPERACIÓN]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="272" y="152" width="230" height="18" uuid="77777777-9999-0000-1111-222222222222"/>
+				<textElement><font size="11" isBold="true"/></textElement>
+				<textFieldExpression><![CDATA["RTO: " + $P{lastRestoreRto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="272" y="172" width="230" height="25" forecolor="#475569" uuid="88888888-0000-1111-2222-333333333333"/>
+				<textElement><font size="9"/></textElement>
+				<textFieldExpression><![CDATA["Estado: " + $P{restoreStatus} + "  |  Smoke tests: " + $P{smokePassed} + " / " + $P{smokeTotal}]]></textFieldExpression>
+			</textField>
+
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="218" width="4" height="20" backcolor="#7C3AED" uuid="99999999-1111-2222-3333-444444444444"/>
+				<graphicElement><pen lineWidth="0"/></graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="12" y="218" width="300" height="20" uuid="00000000-3333-4444-5555-666666666666"/>
+				<textElement verticalAlignment="Middle"><font size="14" isBold="true"/></textElement>
+				<text><![CDATA[3. Cronología de Evidencia]]></text>
 			</staticText>
 			<textField textAdjust="StretchHeight">
-				<reportElement x="20" y="300" width="500" height="40" uuid="898f6bcd-4621-3373-8ade-4e832627b4f6"/>
-				<textElement>
-					<font size="12" isItalic="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{executiveConclusion}]]></textFieldExpression>
+				<reportElement x="12" y="244" width="503" height="50" forecolor="#334155" uuid="11111111-4444-5555-6666-777777777777"/>
+				<textElement><font size="9"/></textElement>
+				<textFieldExpression><![CDATA[$P{timelineSummary}]]></textFieldExpression>
 			</textField>
+
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="310" width="4" height="20" backcolor="#EA580C" uuid="22222222-5555-6666-7777-888888888888"/>
+				<graphicElement><pen lineWidth="0"/></graphicElement>
+			</rectangle>
 			<staticText>
-				<reportElement x="0" y="350" width="300" height="20" uuid="798f6bcd-4621-3373-8ade-4e832627b4f7"/>
-				<textElement>
-					<font size="14" isBold="true"/>
-				</textElement>
+				<reportElement x="12" y="310" width="350" height="20" uuid="33333333-6666-7777-8888-999999999999"/>
+				<textElement verticalAlignment="Middle"><font size="14" isBold="true"/></textElement>
 				<text><![CDATA[4. Trazabilidad y Observabilidad]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="12" y="336" width="503" height="36" forecolor="#475569" uuid="44444444-7777-8888-9999-000000000000"/>
+				<textElement><font size="9"/></textElement>
+				<text><![CDATA[El sistema recopila métricas (Micrometer → Prometheus), logs centralizados (Alloy → Loki) y trazas distribuidas (OpenTelemetry → Jaeger) de forma automática para cada operación.]]></text>
+			</staticText>
 			<textField>
-				<reportElement x="20" y="380" width="500" height="20" uuid="898f6bcd-4621-3373-8ade-4e832627b4f8"/>
-				<textElement>
-					<font size="12" isItalic="false" isUnderline="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Consultar en Jaeger: http://localhost:16686/search?service=target-app"]]></textFieldExpression>
+				<reportElement x="12" y="374" width="503" height="18" forecolor="#2563EB" uuid="55555555-8888-9999-0000-111111111111"/>
+				<textElement><font size="10" isUnderline="true"/></textElement>
+				<textFieldExpression><![CDATA["Consultar trazas: " + $P{jaegerUrl}]]></textFieldExpression>
+			</textField>
+
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="410" width="515" height="80" backcolor="#F1F5F9" uuid="66666666-9999-0000-1111-222222222222"/>
+				<graphicElement><pen lineWidth="0.5" lineColor="#E2E8F0"/></graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="410" width="4" height="80" backcolor="#0F172A" uuid="77777777-0000-1111-2222-333333333333"/>
+				<graphicElement><pen lineWidth="0"/></graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="15" y="415" width="300" height="20" uuid="88888888-1111-2222-3333-444444444444"/>
+				<textElement verticalAlignment="Middle"><font size="14" isBold="true"/></textElement>
+				<text><![CDATA[Conclusión Ejecutiva]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="15" y="440" width="488" height="40" forecolor="#334155" uuid="99999999-2222-3333-4444-555555555555"/>
+				<textElement><font size="10" isItalic="true"/></textElement>
+				<textFieldExpression><![CDATA[$P{executiveConclusion}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
-	
+
 	<pageFooter>
-		<band height="30" splitType="Stretch">
+		<band height="35" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="515" height="1" forecolor="#E2E8F0" uuid="aaaaaaaa-1111-2222-3333-444444444444"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="8" width="250" height="18" forecolor="#94A3B8" uuid="bbbbbbbb-2222-3333-4444-555555555555"/>
+				<textElement><font size="7"/></textElement>
+				<text><![CDATA[Evidence as Code — FLISOL 2026]]></text>
+			</staticText>
 			<textField>
-				<reportElement x="200" y="5" width="155" height="20" uuid="e7b233a7-5d27-4648-91b4-106ea9de7a0d"/>
-				<textElement textAlignment="Center"/>
+				<reportElement x="350" y="8" width="165" height="18" forecolor="#94A3B8" uuid="cccccccc-3333-4444-5555-666666666666"/>
+				<textElement textAlignment="Right"><font size="7"/></textElement>
 				<textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 		</band>

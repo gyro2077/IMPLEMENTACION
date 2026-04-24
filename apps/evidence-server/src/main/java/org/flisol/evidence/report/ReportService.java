@@ -18,6 +18,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import org.flisol.evidence.compliance.ComplianceScanService;
 import org.flisol.evidence.read.EvidenceReadRepository;
+import org.flisol.evidence.read.EvidenceStateEvaluator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -81,12 +82,25 @@ public class ReportService {
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("hostName", hostName);
-            parameters.put("generationDate", Instant.now().toString());
+            parameters.put("generationDate", Instant.now().toString().substring(0, 19).replace("T", " "));
             parameters.put("complianceScore", asString(hostData.get("latest_compliance_score"), "N/A"));
             parameters.put("criticalFindings", criticalFindings);
             parameters.put("lastBackupLabel", asString(hostData.get("latest_backup_label"), "N/A"));
             parameters.put("lastRestoreRto", asString(hostData.get("latest_restore_rto_seconds"), "N/A") + " seg");
             parameters.put("executiveConclusion", calculateConclusion(hostData));
+
+            // New premium parameters
+            parameters.put("backupStatus", asString(hostData.get("latest_backup_status"), "N/A"));
+            long sizeBytes = parseLong(hostData.get("latest_backup_size_bytes"));
+            parameters.put("backupSizeHuman", sizeBytes > 0 ? String.format("%.1f MB", sizeBytes / 1048576.0) : "N/A");
+            parameters.put("backupDuration", asString(hostData.get("latest_backup_duration_seconds"),
+                    asString(hostData.get("duration_seconds"), "N/A")) + " seg");
+            parameters.put("restoreStatus", asString(hostData.get("latest_restore_status"), "N/A"));
+            parameters.put("smokePassed", asString(hostData.get("latest_restore_smoke_passed"), "N/A"));
+            parameters.put("smokeTotal", asString(hostData.get("latest_restore_smoke_total"), "N/A"));
+            parameters.put("evidenceStatusLabel", asString(hostData.get("evidence_status_label"), "Sin evaluar"));
+            parameters.put("jaegerUrl", "http://localhost:16686/search?service=target-app");
+            parameters.put("timelineSummary", buildTimelineSummary(hostData));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
 
@@ -133,10 +147,14 @@ public class ReportService {
 
     private Map<String, Object> findHostData(String hostName) {
         List<Map<String, Object>> hosts = evidenceReadRepository.listHostsWithLatestEvidence();
-        return hosts.stream()
+        Map<String, Object> host = hosts.stream()
             .filter(h -> hostName.equals(h.get("host")))
             .findFirst()
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Host sin evidencia: " + hostName));
+        // Enrich with unified state evaluator
+        Map<String, String> evaluation = EvidenceStateEvaluator.evaluate(host);
+        host.put("evidence_status_label", evaluation.get("status_label"));
+        return host;
     }
 
     private JasperReport getOrCompileTemplate() throws Exception {
@@ -232,5 +250,39 @@ public class ReportService {
     private String asString(Object obj, String fallback) {
         String value = asString(obj);
         return value == null ? fallback : value;
+    }
+
+    private long parseLong(Object value) {
+        if (value == null) return 0;
+        try {
+            return Long.parseLong(value.toString());
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
+    }
+
+    private String buildTimelineSummary(Map<String, Object> hostData) {
+        StringBuilder sb = new StringBuilder();
+        if (hostData.get("latest_compliance_at") != null) {
+            sb.append("• Escaneo de cumplimiento completado — Score: ")
+              .append(asString(hostData.get("latest_compliance_score"), "N/A"))
+              .append("\n");
+        }
+        if (hostData.get("latest_backup_at") != null) {
+            sb.append("• Backup full realizado — Label: ")
+              .append(asString(hostData.get("latest_backup_label"), "N/A"))
+              .append("\n");
+        }
+        if (hostData.get("latest_restore_at") != null) {
+            sb.append("• Restore verificado en entorno aislado — RTO: ")
+              .append(asString(hostData.get("latest_restore_rto_seconds"), "N/A"))
+              .append(" seg, Smoke tests: ")
+              .append(asString(hostData.get("latest_restore_smoke_passed"), "?"))
+              .append("/")
+              .append(asString(hostData.get("latest_restore_smoke_total"), "?"))
+              .append("\n");
+        }
+        sb.append("• Reporte PDF generado automáticamente");
+        return sb.toString();
     }
 }

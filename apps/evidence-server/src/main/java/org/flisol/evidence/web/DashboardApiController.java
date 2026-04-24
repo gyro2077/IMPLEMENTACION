@@ -172,8 +172,8 @@ public class DashboardApiController {
             "enabled", true, "label", "Abrir Jaeger", "url", "http://localhost:16686"
         ));
         actions.put("reload_dataset", Map.of(
-            "enabled", false, "label", "Recargar Dataset",
-            "reason", "Requiere acceso directo a la consola del host."
+            "enabled", true, "label", "Recargar Dataset",
+            "endpoint", "/api/actions/reload-dataset", "method", "POST"
         ));
         actions.put("execute_backup", Map.of(
             "enabled", false, "label", "Ejecutar Backup",
