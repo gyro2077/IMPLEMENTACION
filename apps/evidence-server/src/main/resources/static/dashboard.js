@@ -3,6 +3,8 @@
 let D = null;
 let toastTimer = null;
 let activeTabFrame = null;
+let cpuChartInstance = null;
+let memChartInstance = null;
 
 const TOOLTIP_TERMS = [
     { term: 'RTO', tooltip: 'Recovery Time Objective: tiempo objetivo para recuperar un servicio tras una falla.' },
@@ -61,6 +63,10 @@ function switchTab(name) {
         activeTabFrame = requestAnimationFrame(() => {
             section.classList.add('is-visible');
         });
+
+        if (name === 'observabilidad') {
+            renderObservabilityCharts();
+        }
     }
     if (btn) btn.classList.add('active');
     history.replaceState(null, '', '#' + name);
@@ -923,4 +929,241 @@ function capitalizeLabel(label) {
 
 function escapeRegExp(str) {
     return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/* ── Observability Charts ── */
+async function fetchPrometheusData(query, minutes = 15) {
+    const end = Math.floor(Date.now() / 1000);
+    const start = end - (minutes * 60);
+    const step = 15;
+
+    const url = `/api/dashboard/prometheus/query_range?query=${encodeURIComponent(query)}&start=${start}&end=${end}&step=${step}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.status !== 'success') {
+            throw new Error(data.error || 'Error en respuesta de Prometheus');
+        }
+        return data.data.result;
+    } catch (error) {
+        console.error('Error fetching Prometheus data:', error);
+        throw error;
+    }
+}
+
+function renderObservabilityCharts() {
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js no está cargado');
+        return;
+    }
+
+    destroyCharts();
+
+    const cpuCanvas = document.getElementById('cpu-chart');
+    const memCanvas = document.getElementById('mem-chart');
+    const cpuError = document.getElementById('cpu-chart-error');
+    const memError = document.getElementById('mem-chart-error');
+
+    if (!cpuCanvas || !memCanvas) {
+        console.error('Canvas elements not found');
+        return;
+    }
+
+    cpuError.style.display = 'none';
+    memError.style.display = 'none';
+
+    Promise.all([
+        fetchPrometheusData('process_cpu_usage * 100', 15),
+        fetchPrometheusData('sum(jvm_memory_used_bytes) / 1024 / 1024', 15)
+    ]).then(([cpuData, memData]) => {
+        if (cpuData && cpuData.length > 0) {
+            renderCpuChart(cpuCanvas, cpuData);
+        } else {
+            showChartError(cpuError);
+        }
+
+        if (memData && memData.length > 0) {
+            renderMemChart(memCanvas, memData);
+        } else {
+            showChartError(memError);
+        }
+    }).catch(error => {
+        console.error('Error loading observability charts:', error);
+        showChartError(cpuError);
+        showChartError(memError);
+    });
+}
+
+function renderCpuChart(canvas, data) {
+    const ctx = canvas.getContext('2d');
+    const result = data[0];
+    const values = result.values.map(v => parseFloat(v[1]));
+    const labels = result.values.map(v => new Date(v[0] * 1000).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }));
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
+    gradient.addColorStop(1, 'rgba(16, 185, 129, 0.05)');
+
+    cpuChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'CPU %',
+                data: values,
+                borderColor: '#10b981',
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 2,
+                pointHoverRadius: 5,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#e2e8f0',
+                    bodyColor: '#cbd5e1',
+                    borderColor: '#334155',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return `CPU: ${context.parsed.y.toFixed(2)}%`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#94a3b8',
+                        maxTicksLimit: 8
+                    }
+                },
+                y: {
+                    grid: {
+                        color: '#1e293b',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#94a3b8',
+                        callback: function(value) {
+                            return value.toFixed(0) + '%';
+                        }
+                    },
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+}
+
+function renderMemChart(canvas, data) {
+    const ctx = canvas.getContext('2d');
+    const result = data[0];
+    const values = result.values.map(v => parseFloat(v[1]));
+    const labels = result.values.map(v => new Date(v[0] * 1000).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }));
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(14, 165, 233, 0.3)');
+    gradient.addColorStop(1, 'rgba(14, 165, 233, 0.05)');
+
+    memChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Heap MB',
+                data: values,
+                borderColor: '#0ea5e9',
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 2,
+                pointHoverRadius: 5,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#e2e8f0',
+                    bodyColor: '#cbd5e1',
+                    borderColor: '#334155',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return `Heap: ${context.parsed.y.toFixed(2)} MB`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#94a3b8',
+                        maxTicksLimit: 8
+                    }
+                },
+                y: {
+                    grid: {
+                        color: '#1e293b',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#94a3b8',
+                        callback: function(value) {
+                            return value.toFixed(0) + ' MB';
+                        }
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function showChartError(errorElement) {
+    if (errorElement) {
+        errorElement.style.display = 'block';
+    }
+}
+
+function destroyCharts() {
+    if (cpuChartInstance) {
+        cpuChartInstance.destroy();
+        cpuChartInstance = null;
+    }
+    if (memChartInstance) {
+        memChartInstance.destroy();
+        memChartInstance = null;
+    }
 }

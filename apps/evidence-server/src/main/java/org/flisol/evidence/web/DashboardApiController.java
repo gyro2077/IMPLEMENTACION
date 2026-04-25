@@ -9,8 +9,11 @@ import java.util.Map;
 import org.flisol.evidence.read.EvidenceReadService;
 import org.flisol.evidence.report.ReportService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * API JSON dedicada para alimentar el Dashboard Administrador.
@@ -37,10 +40,12 @@ public class DashboardApiController {
 
     private final EvidenceReadService evidenceReadService;
     private final ReportService reportService;
+    private final RestTemplate restTemplate;
 
     public DashboardApiController(EvidenceReadService evidenceReadService, ReportService reportService) {
         this.evidenceReadService = evidenceReadService;
         this.reportService = reportService;
+        this.restTemplate = new RestTemplate();
     }
 
     @GetMapping("/data")
@@ -203,5 +208,38 @@ public class DashboardApiController {
     private String shortId(String text) {
         if (text == null || "-".equals(text)) return "-";
         return text.length() <= 8 ? text : text.substring(0, 8);
+    }
+
+    @GetMapping("/prometheus/{endpoint}")
+    public Map<String, Object> prometheusProxy(
+            @PathVariable String endpoint,
+            @RequestParam String query,
+            @RequestParam(required = false) Long start,
+            @RequestParam(required = false) Long end,
+            @RequestParam(required = false) String step) {
+
+        String prometheusUrl = "http://flisol-prometheus:9090/api/v1/" + endpoint;
+        StringBuilder urlBuilder = new StringBuilder(prometheusUrl);
+        urlBuilder.append("?query=").append(query);
+
+        if (start != null) {
+            urlBuilder.append("&start=").append(start);
+        }
+        if (end != null) {
+            urlBuilder.append("&end=").append(end);
+        }
+        if (step != null) {
+            urlBuilder.append("&step=").append(step);
+        }
+
+        try {
+            return restTemplate.getForObject(urlBuilder.toString(), Map.class);
+        } catch (Exception e) {
+            Map<String, Object> error = new LinkedHashMap<>();
+            error.put("status", "error");
+            error.put("errorType", "proxy_error");
+            error.put("error", "Error connecting to Prometheus: " + e.getMessage());
+            return error;
+        }
     }
 }
