@@ -5,154 +5,247 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Panel Administrador — Evidence as Code</title>
     <meta name="description" content="Panel de administración centralizado para auditoría, cumplimiento y resiliencia de infraestructura."/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/dashboard.css">
 </head>
-<body>
-    <header id="app-header">
-        <div class="header-content">
-            <div class="header-left">
-                <h1>Panel Administrador</h1>
-                <p class="header-sub">Evidence as Code — FLISOL Demo</p>
-            </div>
-            <div class="header-right">
-                <span id="env-badge" class="badge badge-ready">Cargando…</span>
-                <span id="header-time" class="header-time"></span>
-            </div>
-        </div>
-    </header>
+<body data-env-status="empty">
+    <div class="app-shell">
+        <div class="app-bg-grid" aria-hidden="true"></div>
+        <div class="app-bg-glow app-bg-glow-a" aria-hidden="true"></div>
+        <div class="app-bg-glow app-bg-glow-b" aria-hidden="true"></div>
 
-    <nav id="tab-nav">
-        <div class="tab-nav-inner">
-            <button class="tab active" data-tab="resumen">Resumen</button>
-            <button class="tab" data-tab="cumplimiento">Cumplimiento</button>
-            <button class="tab" data-tab="resiliencia">Resiliencia</button>
-            <button class="tab" data-tab="reportes">Reportes</button>
-            <button class="tab" data-tab="observabilidad">Observabilidad</button>
-        </div>
-    </nav>
+        <header id="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <p class="eyebrow">FLISOL / Evidence as Code</p>
+                    <h1>Security Command Dashboard</h1>
+                    <p class="header-sub">Postura, resiliencia y cadena de custodia para infraestructura auditada.</p>
+                </div>
 
-    <main id="main-content">
-        <div class="container">
-            <!-- Loading state -->
-            <div id="loading" class="loading-box">
-                <div class="spinner"></div>
-                <p>Cargando datos del sistema…</p>
+                <div class="header-right">
+                    <div class="header-status-card">
+                        <div class="status-card-copy">
+                            <span class="status-card-label">Executive Semaphore</span>
+                            <span id="env-badge" class="badge badge-ready">Cargando…</span>
+                        </div>
+                        <div class="status-card-meta">
+                            <span class="status-meta-label">Última consolidación</span>
+                            <span id="header-time" class="header-time"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </header>
 
-            <!-- Error state -->
-            <div id="error-box" class="error-box" style="display:none;">
-                <h3>Error de conexión</h3>
-                <p id="error-msg">No se pudo conectar con el servidor de evidencia.</p>
-                <button class="btn btn-primary" onclick="loadData()">Reintentar</button>
+        <nav id="tab-nav" aria-label="Secciones del dashboard">
+            <div class="tab-nav-inner">
+                <button class="tab active" data-tab="resumen">Resumen</button>
+                <button class="tab" data-tab="cumplimiento">Cumplimiento</button>
+                <button class="tab" data-tab="resiliencia">Resiliencia</button>
+                <button class="tab" data-tab="reportes">Reportes</button>
+                <button class="tab" data-tab="observabilidad">Observabilidad</button>
             </div>
+        </nav>
 
-            <!-- Tab: Resumen -->
-            <section id="tab-resumen" class="tab-content" style="display:none;">
-                <div id="kpi-grid" class="kpi-grid"></div>
-                <div class="grid-2">
-                    <div id="primary-host-card" class="card card-accent"></div>
+        <main id="main-content">
+            <div class="container">
+                <div class="system-state-stack">
+                    <div id="loading" class="loading-box">
+                        <div class="loading-radar" aria-hidden="true">
+                            <div class="spinner"></div>
+                            <div class="loading-radar-ring loading-radar-ring-a"></div>
+                            <div class="loading-radar-ring loading-radar-ring-b"></div>
+                            <div class="loading-radar-ring loading-radar-ring-c"></div>
+                        </div>
+                        <div class="state-copy">
+                            <p class="state-kicker">System bootstrap</p>
+                            <h2>Inicializando telemetría operativa</h2>
+                            <p>Cargando evidencia consolidada, últimas auditorías, respaldos y pruebas de recuperación.</p>
+                        </div>
+                    </div>
+
+                    <div id="error-box" class="error-box" style="display:none;">
+                        <div class="error-box-inner">
+                            <div class="error-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 9v4"></path>
+                                    <path d="M12 17h.01"></path>
+                                    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path>
+                                </svg>
+                            </div>
+                            <div class="state-copy">
+                                <p class="state-kicker">Connection fault</p>
+                                <h3>Error de conexión</h3>
+                                <p id="error-msg">No se pudo conectar con el servidor de evidencia.</p>
+                            </div>
+                            <button class="btn btn-primary" onclick="loadData()">Reintentar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <section id="tab-resumen" class="tab-content" style="display:none;">
+                    <div class="summary-shell">
+                        <div id="kpi-grid" class="kpi-grid"></div>
+                        <div class="summary-grid">
+                            <div id="primary-host-card" class="card card-accent"></div>
+                            <div class="card timeline-card">
+                                <div class="section-heading">
+                                    <p class="section-kicker">Forensic log</p>
+                                    <h2 class="card-title">Cadena de Custodia</h2>
+                                    <p class="card-desc">Secuencia reciente de escaneos, respaldos, recuperaciones y reportes ejecutivos.</p>
+                                </div>
+                                <ul id="timeline" class="timeline"></ul>
+                                <p id="timeline-empty" class="empty-msg" style="display:none;">Sin actividad registrada aún.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tab-cumplimiento" class="tab-content" style="display:none;">
                     <div class="card">
-                        <h2 class="card-title">Actividad Reciente</h2>
-                        <ul id="timeline" class="timeline"></ul>
-                        <p id="timeline-empty" class="empty-msg" style="display:none;">Sin actividad registrada aún.</p>
+                        <div class="section-heading">
+                            <p class="section-kicker">Compliance operations</p>
+                            <h2 class="card-title">Historial de Auditorías de Seguridad</h2>
+                            <p class="card-desc">Escaneos de cumplimiento realizados con OpenSCAP contra políticas CIS.</p>
+                        </div>
+                        <div id="scans-table"></div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- Tab: Cumplimiento -->
-            <section id="tab-cumplimiento" class="tab-content" style="display:none;">
-                <div class="card">
-                    <h2 class="card-title">Historial de Auditorías de Seguridad</h2>
-                    <p class="card-desc">Escaneos de cumplimiento realizados con OpenSCAP contra políticas CIS.</p>
-                    <div id="scans-table"></div>
-                </div>
-            </section>
+                <section id="tab-resiliencia" class="tab-content" style="display:none;">
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="section-heading">
+                                <p class="section-kicker">Backup operations</p>
+                                <h2 class="card-title">Respaldos</h2>
+                                <p class="card-desc">Respaldos full gestionados con pgBackRest.</p>
+                            </div>
+                            <div id="backups-table"></div>
+                        </div>
+                        <div class="card">
+                            <div class="section-heading">
+                                <p class="section-kicker">Recovery drills</p>
+                                <h2 class="card-title">Recuperaciones</h2>
+                                <p class="card-desc">Pruebas de restauración en entornos aislados con smoke tests.</p>
+                            </div>
+                            <div id="restores-table"></div>
+                        </div>
+                    </div>
+                </section>
 
-            <!-- Tab: Resiliencia -->
-            <section id="tab-resiliencia" class="tab-content" style="display:none;">
-                <div class="grid-2">
+                <section id="tab-reportes" class="tab-content" style="display:none;">
                     <div class="card">
-                        <h2 class="card-title">Respaldos (Backups)</h2>
-                        <p class="card-desc">Respaldos full gestionados con pgBackRest.</p>
-                        <div id="backups-table"></div>
+                        <div class="card-header-row">
+                            <div class="section-heading">
+                                <p class="section-kicker">Executive reporting</p>
+                                <h2 class="card-title">Reportes Ejecutivos</h2>
+                                <p class="card-desc">Reportes PDF generados automáticamente con JasperReports.</p>
+                            </div>
+                            <button id="btn-gen-report" class="btn btn-primary" onclick="generateReport()">Generar Nuevo Reporte</button>
+                        </div>
+                        <div id="reports-table"></div>
+                        <p id="reports-empty" class="empty-msg" style="display:none;">No hay reportes generados aún. Presiona el botón para crear uno.</p>
                     </div>
+                </section>
+
+                <section id="tab-observabilidad" class="tab-content" style="display:none;">
                     <div class="card">
-                        <h2 class="card-title">Recuperaciones (Restores)</h2>
-                        <p class="card-desc">Pruebas de restauración en entornos aislados con smoke tests.</p>
-                        <div id="restores-table"></div>
+                        <div class="section-heading">
+                            <p class="section-kicker">Observability fabric</p>
+                            <h2 class="card-title">Observabilidad del Sistema</h2>
+                            <p class="card-desc">La plataforma recopila telemetría de forma automática para sostener trazabilidad y transparencia operativa.</p>
+                        </div>
+                        <div class="obs-grid">
+                            <div class="obs-card">
+                                <div class="obs-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 3v18h18"></path>
+                                        <path d="m7 15 4-4 3 3 5-7"></path>
+                                    </svg>
+                                </div>
+                                <h3>Métricas</h3>
+                                <p>Consumo de CPU, memoria, tiempos de respuesta HTTP y métricas JVM. Recopiladas por Micrometer y visualizadas en Prometheus.</p>
+                                <a href="http://localhost:9090" target="_blank" class="btn btn-outline btn-sm">Ver Prometheus</a>
+                            </div>
+                            <div class="obs-card">
+                                <div class="obs-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 6h16"></path>
+                                        <path d="M4 12h10"></path>
+                                        <path d="M4 18h8"></path>
+                                    </svg>
+                                </div>
+                                <h3>Logs Centralizados</h3>
+                                <p>Todos los logs de los contenedores son recopilados por Alloy y almacenados en Loki para consulta centralizada.</p>
+                                <a href="http://localhost:3000/explore" target="_blank" class="btn btn-outline btn-sm">Explorar en Grafana</a>
+                            </div>
+                            <div class="obs-card">
+                                <div class="obs-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 12h6"></path>
+                                        <path d="M12 9v6"></path>
+                                        <path d="M5.64 5.64A9 9 0 1 1 4 12"></path>
+                                    </svg>
+                                </div>
+                                <h3>Trazas Distribuidas</h3>
+                                <p>Seguimiento de cada petición HTTP entre microservicios usando OpenTelemetry y Jaeger.</p>
+                                <a href="http://localhost:16686" target="_blank" class="btn btn-outline btn-sm">Ver Jaeger</a>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </section>
 
-            <!-- Tab: Reportes -->
-            <section id="tab-reportes" class="tab-content" style="display:none;">
-                <div class="card">
-                    <div class="card-header-row">
-                        <div>
-                            <h2 class="card-title">Reportes Ejecutivos</h2>
-                            <p class="card-desc">Reportes PDF generados automáticamente con JasperReports.</p>
+                    <div class="card">
+                        <div class="section-heading">
+                            <p class="section-kicker">Direct access</p>
+                            <h2 class="card-title">Dashboards Integrados</h2>
+                            <p class="card-desc">Accede a las herramientas de monitoreo con un clic.</p>
                         </div>
-                        <button id="btn-gen-report" class="btn btn-primary" onclick="generateReport()">Generar Nuevo Reporte</button>
+                        <div class="obs-links">
+                            <a href="http://localhost:3000" target="_blank" class="btn btn-primary">Abrir Grafana</a>
+                            <a href="http://localhost:16686" target="_blank" class="btn btn-secondary">Abrir Jaeger</a>
+                            <a href="http://localhost:9090" target="_blank" class="btn btn-secondary">Abrir Prometheus</a>
+                        </div>
                     </div>
-                    <div id="reports-table"></div>
-                    <p id="reports-empty" class="empty-msg" style="display:none;">No hay reportes generados aún. Presiona el botón para crear uno.</p>
-                </div>
-            </section>
+                </section>
+            </div>
+        </main>
 
-            <!-- Tab: Observabilidad -->
-            <section id="tab-observabilidad" class="tab-content" style="display:none;">
-                <div class="card">
-                    <h2 class="card-title">Observabilidad del Sistema</h2>
-                    <p class="card-desc">El sistema recopila telemetría de forma automática para asegurar transparencia en todas las operaciones.</p>
-                    <div class="obs-grid">
-                        <div class="obs-card">
-                            <div class="obs-icon">📊</div>
-                            <h3>Métricas</h3>
-                            <p>Consumo de CPU, memoria, tiempos de respuesta HTTP y métricas JVM. Recopiladas por Micrometer y visualizadas en Prometheus.</p>
-                            <a href="http://localhost:9090" target="_blank" class="btn btn-outline btn-sm">Ver Prometheus</a>
-                        </div>
-                        <div class="obs-card">
-                            <div class="obs-icon">📝</div>
-                            <h3>Logs Centralizados</h3>
-                            <p>Todos los logs de los contenedores son recopilados por Alloy y almacenados en Loki para consulta centralizada.</p>
-                            <a href="http://localhost:3000/explore" target="_blank" class="btn btn-outline btn-sm">Explorar en Grafana</a>
-                        </div>
-                        <div class="obs-card">
-                            <div class="obs-icon">🔗</div>
-                            <h3>Trazas Distribuidas</h3>
-                            <p>Seguimiento de cada petición HTTP entre microservicios usando OpenTelemetry y Jaeger.</p>
-                            <a href="http://localhost:16686" target="_blank" class="btn btn-outline btn-sm">Ver Jaeger</a>
-                        </div>
-                    </div>
+        <footer id="action-bar">
+            <div class="action-bar-inner">
+                <div class="action-buttons" id="action-buttons"></div>
+                <div class="action-links">
+                    <a href="/api/hosts" target="_blank">/api/hosts</a>
+                    <a href="/api/evidence/overview" target="_blank">/api/overview</a>
+                    <a href="/api/compliance/scans" target="_blank">/api/scans</a>
+                    <a href="/api/backups" target="_blank">/api/backups</a>
+                    <a href="/api/restores" target="_blank">/api/restores</a>
                 </div>
-                <div class="card">
-                    <h2 class="card-title">Dashboards Integrados</h2>
-                    <p class="card-desc">Accede a las herramientas de monitoreo con un clic.</p>
-                    <div class="obs-links">
-                        <a href="http://localhost:3000" target="_blank" class="btn btn-primary">Abrir Grafana</a>
-                        <a href="http://localhost:16686" target="_blank" class="btn btn-secondary">Abrir Jaeger</a>
-                        <a href="http://localhost:9090" target="_blank" class="btn btn-secondary">Abrir Prometheus</a>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
+            </div>
+        </footer>
 
-    <footer id="action-bar">
-        <div class="action-bar-inner">
-            <div class="action-buttons" id="action-buttons"></div>
-            <div class="action-links">
-                <a href="/api/hosts" target="_blank">/api/hosts</a>
-                <a href="/api/evidence/overview" target="_blank">/api/overview</a>
-                <a href="/api/compliance/scans" target="_blank">/api/scans</a>
-                <a href="/api/backups" target="_blank">/api/backups</a>
-                <a href="/api/restores" target="_blank">/api/restores</a>
+        <div id="toast" class="toast"></div>
+        <div id="progress-modal" class="progress-modal" aria-hidden="true">
+            <div class="progress-backdrop"></div>
+            <div class="progress-panel progress-state-pending" role="dialog" aria-modal="true" aria-labelledby="progress-title" aria-describedby="progress-detail">
+                <div class="progress-orb" aria-hidden="true">
+                    <div class="progress-spinner"></div>
+                    <div class="progress-orb-ring progress-orb-ring-a"></div>
+                    <div class="progress-orb-ring progress-orb-ring-b"></div>
+                </div>
+                <div class="progress-copy">
+                    <p class="state-kicker">Async operation</p>
+                    <h2 id="progress-title">Ejecutando acción...</h2>
+                    <p id="progress-detail">Preparando operación contra el plano de evidencia.</p>
+                    <div class="progress-meta">
+                        <span id="progress-state-chip" class="metric-pill status-neutral">Pendiente</span>
+                        <span id="progress-job" class="progress-job"></span>
+                    </div>
+                </div>
             </div>
         </div>
-    </footer>
-
-    <div id="toast" class="toast"></div>
+    </div>
 
     <script src="/dashboard.js"></script>
 </body>

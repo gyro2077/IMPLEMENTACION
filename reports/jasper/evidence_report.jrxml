@@ -1,22 +1,479 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Placeholder Fase 5: plantilla Jasper real se agrega más adelante. -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-              name="evidence_report"
+              name="EvidenceExecutiveReport"
               pageWidth="595"
               pageHeight="842"
-              columnWidth="555"
-              leftMargin="20"
-              rightMargin="20"
-              topMargin="20"
-              bottomMargin="20">
+              columnWidth="515"
+              leftMargin="40"
+              rightMargin="40"
+              topMargin="24"
+              bottomMargin="24"
+              whenNoDataType="AllSectionsNoDetail"
+              uuid="9b4d0d0b-44c8-4f47-a5d0-f8d0d9aa5401">
+
+    <parameter name="hostName" class="java.lang.String"/>
+    <parameter name="generationDate" class="java.lang.String"/>
+    <parameter name="complianceScore" class="java.lang.String"/>
+    <parameter name="criticalFindings" class="java.lang.String"/>
+    <parameter name="lastBackupLabel" class="java.lang.String"/>
+    <parameter name="lastRestoreRto" class="java.lang.String"/>
+    <parameter name="executiveConclusion" class="java.lang.String"/>
+    <parameter name="backupStatus" class="java.lang.String"/>
+    <parameter name="backupSizeHuman" class="java.lang.String"/>
+    <parameter name="backupDuration" class="java.lang.String"/>
+    <parameter name="restoreStatus" class="java.lang.String"/>
+    <parameter name="smokePassed" class="java.lang.String"/>
+    <parameter name="smokeTotal" class="java.lang.String"/>
+    <parameter name="evidenceStatusLabel" class="java.lang.String"/>
+    <parameter name="timelineSummary" class="java.lang.String"/>
+    <parameter name="jaegerUrl" class="java.lang.String"/>
+
     <title>
-        <band height="40">
+        <band height="272" splitType="Stretch">
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="515" height="172" backcolor="#0F172A"/>
+                <graphicElement>
+                    <pen lineWidth="0.0"/>
+                </graphicElement>
+            </rectangle>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="172" width="515" height="6" backcolor="#2563EB"/>
+                <graphicElement>
+                    <pen lineWidth="0.0"/>
+                </graphicElement>
+            </rectangle>
+
             <staticText>
-                <reportElement x="0" y="0" width="555" height="30"/>
-                <text><![CDATA[Evidence Report - Placeholder]]></text>
+                <reportElement x="24" y="20" width="230" height="14" forecolor="#94A3B8"/>
+                <textElement>
+                    <font fontName="SansSerif" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[FLISOL / EVIDENCE AS CODE]]></text>
             </staticText>
+
+            <staticText>
+                <reportElement x="24" y="42" width="330" height="50" forecolor="#F8FAFC"/>
+                <textElement>
+                    <font fontName="SansSerif" size="23" isBold="true"/>
+                </textElement>
+                <text><![CDATA[REPORTE DE EVIDENCIA Y
+POSTURA DE SEGURIDAD]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="24" y="97" width="300" height="16" forecolor="#CBD5E1"/>
+                <textElement>
+                    <font fontName="SansSerif" size="10"/>
+                </textElement>
+                <text><![CDATA[Informe ejecutivo de auditoría, resiliencia y trazabilidad operativa]]></text>
+            </staticText>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="360" y="26" width="131" height="34" backcolor="#E2E8F0"/>
+                <graphicElement>
+                    <pen lineWidth="0.0"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="372" y="32" width="107" height="9" forecolor="#64748B"/>
+                <textElement textAlignment="Center">
+                    <font fontName="SansSerif" size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[ESTADO GLOBAL]]></text>
+            </staticText>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="372" y="42" width="107" height="12" forecolor="#0F172A"/>
+                <textElement textAlignment="Center">
+                    <font fontName="SansSerif" size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{evidenceStatusLabel} == null ? "SIN EVALUAR" : $P{evidenceStatusLabel}]]></textFieldExpression>
+            </textField>
+
+            <line>
+                <reportElement x="24" y="124" width="467" height="1" forecolor="#334155"/>
+            </line>
+
+            <staticText>
+                <reportElement x="24" y="136" width="130" height="10" forecolor="#64748B"/>
+                <textElement>
+                    <font fontName="SansSerif" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[ACTIVO EVALUADO]]></text>
+            </staticText>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="24" y="148" width="275" height="18" forecolor="#F8FAFC"/>
+                <textElement>
+                    <font fontName="SansSerif" size="15" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{hostName} == null ? "Sin host" : $P{hostName}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="320" y="136" width="120" height="10" forecolor="#64748B"/>
+                <textElement>
+                    <font fontName="SansSerif" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[FECHA DE GENERACIÓN]]></text>
+            </staticText>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="320" y="148" width="171" height="16" forecolor="#E2E8F0"/>
+                <textElement textAlignment="Right">
+                    <font fontName="SansSerif" size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{generationDate} == null ? "N/A" : $P{generationDate}]]></textFieldExpression>
+            </textField>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="192" width="515" height="72" backcolor="#F8FAFC"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CBD5E1"/>
+                </graphicElement>
+            </rectangle>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="192" width="6" height="72" backcolor="#2563EB"/>
+                <graphicElement>
+                    <pen lineWidth="0.0"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="18" y="202" width="180" height="14" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[CONCLUSIÓN EJECUTIVA]]></text>
+            </staticText>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="18" y="222" width="481" height="30" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="10" isItalic="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{executiveConclusion} == null ? "Sin conclusión disponible." : $P{executiveConclusion}]]></textFieldExpression>
+            </textField>
         </band>
     </title>
+
+    <detail>
+        <band height="1" splitType="Stretch"/>
+    </detail>
+
+    <pageFooter>
+        <band height="24" splitType="Stretch">
+            <line>
+                <reportElement x="0" y="0" width="515" height="1" forecolor="#CBD5E1"/>
+            </line>
+
+            <staticText>
+                <reportElement x="0" y="8" width="220" height="10" forecolor="#94A3B8"/>
+                <textElement>
+                    <font fontName="SansSerif" size="7"/>
+                </textElement>
+                <text><![CDATA[Evidence as Code — Informe Ejecutivo de Ciberseguridad]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="395" y="8" width="120" height="10" forecolor="#94A3B8"/>
+                <textElement textAlignment="Right">
+                    <font fontName="SansSerif" size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <summary>
+        <band height="472" splitType="Stretch">
+            <staticText>
+                <reportElement x="0" y="0" width="210" height="14" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[PANEL DE INDICADORES EJECUTIVOS]]></text>
+            </staticText>
+
+            <line>
+                <reportElement x="0" y="18" width="515" height="1" forecolor="#CBD5E1"/>
+            </line>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="30" width="160" height="96" backcolor="#F8FAFC"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CBD5E1"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="16" y="42" width="128" height="10" forecolor="#64748B"/>
+                <textElement textAlignment="Center">
+                    <font fontName="SansSerif" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[SCORE CIS]]></text>
+            </staticText>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="16" y="58" width="128" height="28" forecolor="#0F172A"/>
+                <textElement textAlignment="Center">
+                    <font fontName="SansSerif" size="24" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{complianceScore} == null ? "N/A" : $P{complianceScore}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="16" y="91" width="128" height="10" forecolor="#94A3B8"/>
+                <textElement textAlignment="Center">
+                    <font fontName="SansSerif" size="8"/>
+                </textElement>
+                <text><![CDATA[Escala 0–100]]></text>
+            </staticText>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="178" y="30" width="160" height="96" backcolor="#F8FAFC"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CBD5E1"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="194" y="42" width="128" height="10" forecolor="#64748B"/>
+                <textElement textAlignment="Center">
+                    <font fontName="SansSerif" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[RTO ÚLTIMO RESTORE]]></text>
+            </staticText>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="194" y="58" width="128" height="28" forecolor="#0F172A"/>
+                <textElement textAlignment="Center">
+                    <font fontName="SansSerif" size="22" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{lastRestoreRto} == null ? "N/A" : $P{lastRestoreRto}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="194" y="91" width="128" height="10" forecolor="#94A3B8"/>
+                <textElement textAlignment="Center">
+                    <font fontName="SansSerif" size="8"/>
+                </textElement>
+                <text><![CDATA[Tiempo de recuperación observado]]></text>
+            </staticText>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="356" y="30" width="159" height="96" backcolor="#F8FAFC"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CBD5E1"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="372" y="42" width="127" height="10" forecolor="#64748B"/>
+                <textElement textAlignment="Center">
+                    <font fontName="SansSerif" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[PRUEBAS SMOKE]]></text>
+            </staticText>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="372" y="58" width="127" height="28" forecolor="#0F172A"/>
+                <textElement textAlignment="Center">
+                    <font fontName="SansSerif" size="22" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[($P{smokePassed} == null ? "N/A" : $P{smokePassed}) + " / " + ($P{smokeTotal} == null ? "N/A" : $P{smokeTotal})]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="372" y="91" width="127" height="10" forecolor="#94A3B8"/>
+                <textElement textAlignment="Center">
+                    <font fontName="SansSerif" size="8"/>
+                </textElement>
+                <text><![CDATA[Validación funcional posterior al restore]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="0" y="146" width="235" height="14" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[RESUMEN DE RESILIENCIA]]></text>
+            </staticText>
+
+            <line>
+                <reportElement x="0" y="164" width="515" height="1" forecolor="#CBD5E1"/>
+            </line>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="176" width="247" height="92" backcolor="#F8FAFC"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CBD5E1"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="16" y="188" width="160" height="12" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Backup verificado]]></text>
+            </staticText>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="16" y="206" width="215" height="12" forecolor="#64748B"/>
+                <textElement>
+                    <font fontName="SansSerif" size="8" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Etiqueta: " + ($P{lastBackupLabel} == null ? "N/A" : $P{lastBackupLabel})]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="16" y="224" width="215" height="12" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Estado: " + ($P{backupStatus} == null ? "N/A" : $P{backupStatus})]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="16" y="240" width="215" height="12" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Tamaño: " + ($P{backupSizeHuman} == null ? "N/A" : $P{backupSizeHuman})]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="16" y="256" width="215" height="12" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Duración: " + ($P{backupDuration} == null ? "N/A" : $P{backupDuration})]]></textFieldExpression>
+            </textField>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="268" y="176" width="247" height="92" backcolor="#F8FAFC"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CBD5E1"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="284" y="188" width="160" height="12" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Restore validado]]></text>
+            </staticText>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="284" y="206" width="215" height="12" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Estado: " + ($P{restoreStatus} == null ? "N/A" : $P{restoreStatus})]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="284" y="224" width="215" height="12" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA["RTO: " + ($P{lastRestoreRto} == null ? "N/A" : $P{lastRestoreRto})]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="284" y="240" width="215" height="12" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Smoke tests OK: " + ($P{smokePassed} == null ? "N/A" : $P{smokePassed}) + " / " + ($P{smokeTotal} == null ? "N/A" : $P{smokeTotal})]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="0" y="288" width="250" height="14" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[HALLAZGOS CRÍTICOS]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="268" y="288" width="247" height="14" forecolor="#334155"/>
+                <textElement>
+                    <font fontName="SansSerif" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[CADENA DE CUSTODIA]]></text>
+            </staticText>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="308" width="247" height="118" backcolor="#FEF2F2"/>
+                <graphicElement>
+                    <pen lineWidth="0.8" lineColor="#EF4444"/>
+                </graphicElement>
+            </rectangle>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="308" width="6" height="118" backcolor="#EF4444"/>
+                <graphicElement>
+                    <pen lineWidth="0.0"/>
+                </graphicElement>
+            </rectangle>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="18" y="320" width="213" height="92" forecolor="#7F1D1D"/>
+                <textElement>
+                    <font fontName="Monospaced" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{criticalFindings} == null ? "Sin hallazgos." : $P{criticalFindings}]]></textFieldExpression>
+            </textField>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="268" y="308" width="247" height="118" backcolor="#1E293B"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#334155"/>
+                </graphicElement>
+            </rectangle>
+
+            <line>
+                <reportElement x="280" y="328" width="223" height="1" forecolor="#334155"/>
+            </line>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="284" y="320" width="215" height="92" forecolor="#E2E8F0"/>
+                <textElement>
+                    <font fontName="Monospaced" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{timelineSummary} == null ? "Sin cronología disponible." : $P{timelineSummary}]]></textFieldExpression>
+            </textField>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="438" width="515" height="28" backcolor="#F8FAFC"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CBD5E1"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="14" y="447" width="118" height="10" forecolor="#64748B"/>
+                <textElement>
+                    <font fontName="SansSerif" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[TRAZABILIDAD ADICIONAL]]></text>
+            </staticText>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="136" y="446" width="365" height="12" forecolor="#2563EB"/>
+                <textElement>
+                    <font fontName="SansSerif" size="8" isUnderline="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{jaegerUrl} == null ? "Sin URL disponible" : $P{jaegerUrl}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
 </jasperReport>
