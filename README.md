@@ -169,7 +169,7 @@ sequenceDiagram
 ## 📁 Estructura del Repositorio
 
 ```text
-flisol-evidence-as-code/
+evidence-as-code/
 ├── README.md                          # Este archivo
 ├── manual_flisol_evidence_as_code.md  # Manual técnico detallado
 ├── compose/                           # Configuración Docker Compose
@@ -264,8 +264,8 @@ flisol-evidence-as-code/
 ### Paso 1: Clonar el Repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/flisol-evidence-as-code.git
-cd flisol-evidence-as-code
+git clone https://github.com/tu-usuario/evidence-as-code.git
+cd evidence-as-code
 ```
 
 ### Paso 2: Configurar Variables de Entorno
@@ -893,8 +893,8 @@ Este proyecto está licenciado bajo la Licencia MIT - ver el archivo [LICENSE](L
 
 Para preguntas, problemas o sugerencias:
 
-- **Issues:** [GitHub Issues](https://github.com/tu-usuario/flisol-evidence-as-code/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/tu-usuario/flisol-evidence-as-code/discussions)
+- **Issues:** [GitHub Issues](https://github.com/tu-usuario/evidence-as-code/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/tu-usuario/evidence-as-code/discussions)
 - **Email:** tu-email@ejemplo.com
 
 ---
